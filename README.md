@@ -1,4 +1,4 @@
-# Lexoffice Voucher Push
+# Lexoffice Voucher Upload
 
 Upload your vouchers/invoices from email attachements to Lexoffice.
 
