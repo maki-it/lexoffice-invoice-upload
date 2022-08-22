@@ -6,6 +6,6 @@ setup(
    description='Upload your vouchers/invoices from email attachements to Lexoffice.',
    author='Maki IT - Kim Oliver Drechsel',
    author_email='kontakt@maki-it.de',
-   packages=['lexoffice-voucher-upload'],  # would be the same as name
-   install_requires=['wheel', 'bar', 'greek'], #external packages acting as dependencies
+   packages=['lexoffice-voucher-upload'],
+   install_requires=['configparser~=5.3.0', 'columnar~=1.4.1', 'pycurl~=7.45.1'],
 )
