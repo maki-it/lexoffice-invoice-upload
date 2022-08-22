@@ -36,3 +36,18 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 2. Specify your configuration in `config.ini`
 3. run `python main.py` 
 4. Mails in specified maildir will automatically be searched for attachements with the configured file extension, then downloaed und uploaded to Lexoffice via their API.
+
+### CLI Arguments
+- `-c`, `--config` specify the config file to use. If nothing is specified, `./config.ini` will be used.
+- `-q`, `--quiet` don't print status messages to stdout.
+
+### Multiple config files
+
+If you have more than one mailbox to check, you can create multiple config files and iterate/loop over them like with a simple bash script:
+```bash
+touch config_tom.ini config_lisa.ini config_joe.ini
+
+for configfile in /path/to/config/config*.ini; do
+    python3 main.py --config $configfile >> logfile.log
+done
+```
