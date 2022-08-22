@@ -3,7 +3,7 @@
 Upload your vouchers/invoices from email attachements to Lexoffice.
 
 # Requirements
-See `requirements.txt`
+- See `requirements.txt`
 - pycurl: The installation of pycurl can give you a hard time. Here is what worked for me on Windows and MacOS 
     - Windows: If installation fails you can try to install from the [unofficial binary](https://www.lfd.uci.e~du/~gohlke/pythonlibs/#pycurl, see this  [stackoverflow comment](https://stackoverflow.com/a/53598619/6679493) for more details)
     - MacOS: Run the following
@@ -14,6 +14,22 @@ See `requirements.txt`
         export CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include"
         pip3 install --no-cache-dir --ignore-installed --compile --install-option="--with-openssl" pycurl
         ```
+    - Linux (Ubuntu):
+        1. Install requirements:
+            ```bash
+            apt install libssl-dev libcurl4-openssl-dev libcurl4-gnutls-dev libgnutls-dev python3-dev
+            ```
+            If you get the error Package *libgnutls-dev* is not available, then instead of `libgnutls-dev` install `libgnutls28-dev`
+            
+            If this also doesn't work (or `apt` says you have unmet dependencies), try to install everything with `aptitude` instead of `apt`:
+            ```bash
+            aptitude install libssl-dev libcurl4-openssl-dev libcurl4-gnutls-dev python3-dev
+            ```
+
+        2. Then install `pycurl`:
+            ```bash
+            pip3 install pycurl
+            ```
 
 # Usage
 1. Install requirements `pip install -r /path/to/requirements.txt`
