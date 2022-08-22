@@ -1,16 +1,34 @@
+#!/usr/bin/env python3
+
 #Disable pycache
 import sys
 sys.dont_write_bytecode = True
 
 import tempfile
+from argparse import ArgumentParser
 from columnar import columnar
 from voucher import Config, AttachementCollector, LexofficeUpload
 
+
+parser = ArgumentParser(description="Upload your vouchers/invoices from email attachements to Lexoffice.")
+parser.add_argument("-c", "--config", dest="filename",
+                    help="specify the config file to use. If nothing is specified, ./config.ini will be used.", metavar="FILE")
+parser.add_argument("-q", "--quiet",
+                    action="store_false", dest="verbose", default=True,
+                    help="don't print status messages to stdout.")
+args = parser.parse_args()
+
 config = Config()
-config = config.readconfig()
+if args.filename:
+    config = config.readconfig(filename=args.filename)
+else:
+    config = config.readconfig()
+
 
 collectedFiles = []
+foundFiles = []
 mailDirs = config['Mail']['maildir'].split(',')
+mailFilter = config['Mail']['filter']
 fileExtensionFilter = config['Mail']['extensionsToCheck'].lower().split(',')
 subjectFilter = config['Mail']['subjectsToCheck'].split(',')
 tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
@@ -20,31 +38,56 @@ voucherupload = LexofficeUpload(apiToken=str(config['Lexoffice']['accessToken'])
 
 vouchercollector.login()
 
-for maildir in mailDirs: 
-    vouchercollector.select(maildir)
-    status, mails = vouchercollector.search()
-    collectedFiles.append(
-        vouchercollector.download_attachements(mails, tmpDir.name, tuple(fileExtensionFilter), tuple(subjectFilter))
-    )
+for mailDir in mailDirs: 
+    vouchercollector.select(mailDir)
+    status, mails = vouchercollector.searchMails(mailFilter)
+    foundFiles.append(vouchercollector.searchAttachements(mails, mailDir, tuple(fileExtensionFilter), tuple(subjectFilter)))
 
 # Merge sublists of each maildir into one list
-collectedFiles = [x for sublist in collectedFiles for x in sublist]
+foundFiles = [x for sublist in foundFiles for x in sublist]
+
+if foundFiles:
+    if args.verbose:
+        fileCount = len(foundFiles)
+        counter = 1
+        print(f"⬇ Downloading {len(foundFiles)} files...") 
+
+    for file in foundFiles:  
+
+        if args.verbose:
+            
+            print(f"{counter}/{fileCount} - {file[0]}")
+            counter+=1
+
+        collectedFiles.append(
+            vouchercollector.downloadAttachements(file, tmpDir.name)
+        )
 
 if collectedFiles:
-    print("\n⬆ Uploading files...")
+    if args.verbose:
+        fileCount = len(collectedFiles)
+        counter = 1
+        print(f"\n⬆ Uploading {fileCount} files...")
+
     for file in collectedFiles:
         fileName = file[1]
-        print(fileName)
+
+        if args.verbose:
+            print(f"{counter}/{fileCount} - {fileName}")
+            counter+=1
+
         voucherupload.fileUpload(tmpDir.name, fileName)
 
-    if config['Default']['showTable'].lower() == 'true':
+    
+    if args.verbose and config['Default']['showTable'].lower() == 'true':
         print("")
-        print("Processed mails and files:")
+        print(f"SUMMARY - {counter} processed files")
         headers = ['Mail Directory', 'Filename', 'Mail Subject', 'Mail From', 'Mail  Send Date']
         table = columnar(collectedFiles, headers, no_borders=True)
         print(table)
 else:
-    print("No new files found.")
+    if args.verbose:
+        print("No new files found.")
 
 vouchercollector.logout()
 tmpDir.cleanup()

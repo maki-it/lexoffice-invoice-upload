@@ -27,8 +27,8 @@ class LexofficeUpload:
                 "Content-Type: multipart/form-data",
                 "Accept: application/json"
             ])
-            c.perform()
+            response = c.perform_rs()
             c.close()
-            print()
+
         except Exception as e:
-            exit("Error: File upload failed.\n" + e)
+            exit("Error: File upload failed.\n" + str(e))

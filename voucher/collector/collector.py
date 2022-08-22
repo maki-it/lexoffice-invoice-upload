@@ -4,6 +4,7 @@ import email
 import string
 from sys import exit
 
+
 class AttachementCollector:
     """
     A class for downloading mail attachements.
@@ -41,20 +42,19 @@ class AttachementCollector:
 
     def select(self, maildir='Inbox') -> tuple[str, list[bytes | None]]:
         """Select mail directory on mail server"""
-        self.maildir = maildir
-        return self.imap.select(self.maildir)
+        return self.imap.select(maildir)
 
-    def search(self) -> tuple[str, list[bytes | None]]:
+    def searchMails(self, filter: str) -> tuple[str, list[bytes | None]]:
         """Search for mails in selected mail directory with filter"""
-        return self.imap.search(None, self.config['Mail']['filter'])
+        return self.imap.search(None, filter)
 
-    def download_attachements(self, mails: list, tmpDir: string, fileExtensionFilter: tuple = (".pdf"), subjectFilter: tuple = ()) -> list:
-        """"Download attachements with specified file extensions from mail"""
-        collectedFiles = []
+    def searchAttachements(self, mails: list, mailDir: str, fileExtensionFilter: tuple = (".pdf"), subjectFilter: tuple = ()) -> list:
+        """Search given mails for attachements with applied filter"""
 
-        # For found mails in maildir 
+        foundFiles = []
+        
         for num in mails[0].split():
-            # Fetch found mail from maildir 
+            # Fetch found mail from selected maildir 
             returnvalue, data = self.imap.fetch(num, '(RFC822)' )
 
             # Set mail as seen
@@ -68,11 +68,7 @@ class AttachementCollector:
 
             # If subjectFilter is empty or subjectFilter contains a word in email subject
             if not all(subjectFilter) or any(substring in emailMessage['subject'] for substring in subjectFilter):
-                # download attachments from mail
-                if not self.downloadStarted:
-                    print("⬇ Downloading files...")
-                    self.downloadStarted = True
-                    
+                # download attachments from mail 
                 for part in emailMessage.walk():
 
                     if part.get_content_maintype() == 'multipart':
@@ -80,24 +76,30 @@ class AttachementCollector:
                     if part.get('Content-Disposition') is None:
                         continue
 
-                    fileName = part.get_filename(tmpDir)
+                    fileName = part.get_filename()
 
                     if bool(fileName):
                         # Check if fileName ending matches list of fileextensions from config
                         if fileName.lower().endswith(fileExtensionFilter):
-                            filePath = os.path.join(tmpDir, fileName)
+                            foundFiles.append((fileName, mailDir, emailMessage, part))
+                        
+        return foundFiles
 
-                            # Check if file doesn't already exists
-                            if not os.path.isfile(filePath):
-                                fp = open(filePath, 'wb')
-                                fp.write(part.get_payload(decode=True))
-                                fp.close()
-                                collectedFiles.append([self.maildir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']])
 
-                                # Show last downloaded file as status indicactor
-                                print(f"{fileName}")
-        
-        return collectedFiles
+    def downloadAttachements(self, file: list, tmpDir: str) -> list:
+        """"Download attachements with specified file extensions from mail"""
+        fileName, mailDir, emailMessage, part = file
+        filePath = os.path.join(tmpDir, file[0])
+
+        # Check if file doesn't already exist before download
+        if not os.path.isfile(filePath):
+            fp = open(filePath, 'wb')
+            fp.write(part.get_payload(decode=True))
+            fp.close()
+            return [mailDir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']]
+        else:
+            return None
+
             
         
 
