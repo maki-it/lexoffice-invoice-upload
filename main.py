@@ -15,7 +15,8 @@ config = config.readconfig()
 
 collectedFiles = []
 mailDirs = config['Mail']['maildir'].split(',')
-fileExtensions = config['Mail']['extensionsToCheck'].split(',')
+fileExtensionFilter = config['Mail']['extensionsToCheck'].lower().split(',')
+subjectFilter = config['Mail']['subjectsToCheck'].split(',')
 tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
 
 vouchercollector = AttachementCollector(config=config)
@@ -23,24 +24,23 @@ voucherpush = LexofficePush(apiToken=str(config['Lexoffice']['accessToken']))
 
 vouchercollector.login()
 
-print("Downloading files...")
 for maildir in mailDirs: 
     vouchercollector.select(maildir)
     status, mails = vouchercollector.search()
     
-    collectedFiles.append(vouchercollector.download_attachements(mails, tmpDir.name, tuple(fileExtensions)))
+    collectedFiles.append(vouchercollector.download_attachements(mails, tmpDir.name, tuple(fileExtensionFilter), tuple(subjectFilter)))
 
 # Merge sublists of each maildir into one list
 collectedFiles = [x for sublist in collectedFiles for x in sublist]
 
 if collectedFiles:
-    print("\nUploading files...")
+    print("\n⬆ Uploading files...")
     for file in collectedFiles:
         voucherpush.fileUpload(tmpDir.name, file[1])
 
     if config['Default']['showTable'].lower() == 'true':
-        print("\Processed mails and files:")
-        headers = ['Mail Directory', 'Filename', 'Subject', 'From', 'Send Date']
+        print("Processed mails and files:")
+        headers = ['Mail Directory', 'Filename', 'Mail Subject', 'Mail From', 'Mail  Send Date']
         table = columnar(collectedFiles, headers, no_borders=True)
         print(table)
 else:

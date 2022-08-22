@@ -10,6 +10,7 @@ class AttachementCollector:
     """
     def __init__(self, config) -> None:
         self.config = config
+        self.downloadStarted = False
 
     def login(self) -> None:
         """
@@ -46,7 +47,7 @@ class AttachementCollector:
     def search(self) -> tuple[str, list[bytes | None]]:
         return self.imap.search(None, self.config['Mail']['filter'])
 
-    def download_attachements(self, mails: list, tmpDir: string, fileExtensions: tuple = (".pdf")) -> list:
+    def download_attachements(self, mails: list, tmpDir: string, fileExtensionFilter: tuple = (".pdf"), subjectFilter: tuple = ()) -> list:
         """"
         Download attachements with specified file extensions from mail
         """
@@ -66,30 +67,36 @@ class AttachementCollector:
             rawEmailString = rawEmail.decode('utf-8')
             emailMessage = email.message_from_string(rawEmailString)
 
-            # download attachments from mail
-            for part in emailMessage.walk():
+            # If subjectFilter is empty or subjectFilter contains a word in email subject
+            if not all(subjectFilter) or any(substring in emailMessage['subject'] for substring in subjectFilter):
+                # download attachments from mail
+                if not self.downloadStarted:
+                    print("⬇ Downloading files...")
+                    self.downloadStarted = True
+                    
+                for part in emailMessage.walk():
 
-                if part.get_content_maintype() == 'multipart':
-                    continue
-                if part.get('Content-Disposition') is None:
-                    continue
+                    if part.get_content_maintype() == 'multipart':
+                        continue
+                    if part.get('Content-Disposition') is None:
+                        continue
 
-                fileName = part.get_filename(tmpDir)
+                    fileName = part.get_filename(tmpDir)
 
-                if bool(fileName):
-                    # Check if fileName ending matches list of fileextensions from config
-                    if fileName.lower().endswith(fileExtensions):
-                        filePath = os.path.join(tmpDir, fileName)
+                    if bool(fileName):
+                        # Check if fileName ending matches list of fileextensions from config
+                        if fileName.lower().endswith(fileExtensionFilter):
+                            filePath = os.path.join(tmpDir, fileName)
 
-                        # Check if file doesn't already exists
-                        if not os.path.isfile(filePath):
-                            fp = open(filePath, 'wb')
-                            fp.write(part.get_payload(decode=True))
-                            fp.close()
-                            collectedFiles.append([self.maildir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']])
+                            # Check if file doesn't already exists
+                            if not os.path.isfile(filePath):
+                                fp = open(filePath, 'wb')
+                                fp.write(part.get_payload(decode=True))
+                                fp.close()
+                                collectedFiles.append([self.maildir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']])
 
-                            # Show last downloaded file as status indicactor
-                            print(f"{fileName}")
+                                # Show last downloaded file as status indicactor
+                                print(f"{fileName}")
         
         return collectedFiles
             
