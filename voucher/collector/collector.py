@@ -45,12 +45,11 @@ class AttachementCollector:
         return self.imap.select(self.maildir)
 
     def search(self) -> tuple[str, list[bytes | None]]:
+        """Search for mails in selected mail directory with filter"""
         return self.imap.search(None, self.config['Mail']['filter'])
 
     def download_attachements(self, mails: list, tmpDir: string, fileExtensionFilter: tuple = (".pdf"), subjectFilter: tuple = ()) -> list:
-        """"
-        Download attachements with specified file extensions from mail
-        """
+        """"Download attachements with specified file extensions from mail"""
         collectedFiles = []
 
         # For found mails in maildir 
