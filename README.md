@@ -4,7 +4,16 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 
 # Requirements
 See `requirements.txt`
-- pycurl (If installation fails you can try to install from the [unofficial binary](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycurl), see this  [stackoverflow comment](https://stackoverflow.com/a/53598619/6679493) for more details)
+- pycurl: The installation of pycurl can give you a hard time. Here is what worked for me on Windows and MacOS 
+    - Windows: If installation fails you can try to install from the [unofficial binary](https://www.lfd.uci.e~du/~gohlke/pythonlibs/#pycurl, see this  [stackoverflow comment](https://stackoverflow.com/a/53598619/6679493) for more details)
+    - MacOS: Run the following
+        ```bash
+        brew install openssl
+        export PYCURL_SSL_LIBRARY=openssl
+        export LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib"
+        export CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include"
+        pip3 install --no-cache-dir --ignore-installed --compile --install-option="--with-openssl" pycurl
+        ```
 
 # Usage
 1. Install requirements `pip install -r /path/to/requirements.txt`
