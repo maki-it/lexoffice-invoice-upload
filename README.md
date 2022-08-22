@@ -4,7 +4,7 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 
 # Requirements
 - See `requirements.txt`
-- pycurl: The installation of pycurl can give you a hard time. Here is what worked for me on Windows and MacOS 
+- pycurl: The installation of pycurl can give you a hard time. Here is what worked for me on Windows, MacOS and Ubuntu.
     - Windows: If installation fails you can try to install from the [unofficial binary](https://www.lfd.uci.e~du/~gohlke/pythonlibs/#pycurl, see this  [stackoverflow comment](https://stackoverflow.com/a/53598619/6679493) for more details)
     - MacOS: Run the following
         ```bash
