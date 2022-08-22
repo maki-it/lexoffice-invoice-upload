@@ -1,6 +1,6 @@
 import configparser
 from voucher.collector import AttachementCollector
-from voucher.pusher import LexofficePush
+from voucher.uploader import LexofficeUpload
 
 class Config:
     def __init__(self):

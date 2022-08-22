@@ -1,10 +1,9 @@
-from urllib import response
 import pycurl
 
 
-class LexofficePush:
+class LexofficeUpload:
     """
-    Class to upload voucher files 
+    A class for uploading invoice/voucher documents
     """
     def __init__(self, apiToken: str) -> None:
         self.apiUrl = 'https://api.lexoffice.io/v1/files'
