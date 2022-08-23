@@ -33,20 +33,25 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 
 ## Usage
 1. Install requirements `pip install -r requirements.txt`
-2. Specify your configuration in `config.ini`
-3. run `python main.py` 
+2. Specify your configuration in `config.ini` (you can generate a config file with `python3 main.py --generate` or `python3 main.py --generate --config /my/destination/mycustomconfig.conf`)
+3. Run `python3 main.py`
 4. Mails in specified maildir will automatically be searched for attachements with the configured file extension, then downloaed und uploaded to Lexoffice via their API.
 
 ### CLI Arguments
 - `-c`, `--config` specify the config file to use. If nothing is specified, `./config.ini` will be used.
 - `-q`, `--quiet` don't print status messages to stdout.
+- `-g`, `--generate` generate a new configruation file, optionally specify path and filename with `--config` argument.
 
 ### Multiple config files
 
 If you have more than one mailbox to check, you can create multiple config files and iterate/loop over them like with a simple bash script:
 ```bash
-touch config_tom.ini config_lisa.ini config_joe.ini
+# Generate config files from template with specific destination and file name
+python3 main.py --generate --config /path/to/config/config_tom.ini
+python3 main.py --generate --config /path/to/config/config_lisa.ini
+python3 main.py --generate --config /path/to/config/config_joe.ini
 
+# Run program with specific configuration files
 for configfile in /path/to/config/config*.ini; do
     python3 main.py --config $configfile >> logfile.log
 done
