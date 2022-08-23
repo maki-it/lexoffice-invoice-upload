@@ -1,7 +1,6 @@
 import imaplib
 import os
 import email
-import string
 from sys import exit
 
 
@@ -31,16 +30,23 @@ class AttachementCollector:
             self.imap.starttls(ssl_context=tls_context)
         
         else:
-            exit("Error: ['Mail']['method'] in config must be set to either SSL or STARTTLS!")
+            exit("Error: ['Mail']['method'] in config must be set to either SSL or STARTTLS")
 
-        self.imap.login(self.config['Mail']['username'], self.config['Mail']['password'])
+        try:
+            self.imap.login(self.config['Mail']['username'], self.config['Mail']['password'])
+        except self.imap.error as e:
+            if "AUTHENTICATIONFAILED" in str(e):
+                exit("Error: Authentication to mailbox failed")
+            else:
+                exit("Error: ", str(e))
+
 
     def logout(self) -> None: 
         """Safely close the connection and logout of mail server"""
         self.imap.close()
         self.imap.logout()
 
-    def select(self, maildir='Inbox') -> tuple[str, list[bytes | None]]:
+    def select(self, maildir: str = 'Inbox') -> tuple[str, list[bytes | None]]:
         """Select mail directory on mail server"""
         return self.imap.select(maildir)
 
