@@ -4,26 +4,49 @@
 import sys
 sys.dont_write_bytecode = True
 
+import os
 import tempfile
 from argparse import ArgumentParser
 from columnar import columnar
 from voucher import Config, AttachementCollector, LexofficeUpload
 
 
+### Prepare program arguments
 parser = ArgumentParser(description="Upload your vouchers/invoices from email attachements to Lexoffice.")
 parser.add_argument("-c", "--config", dest="filename",
                     help="specify the config file to use. If nothing is specified, ./config.ini will be used.", metavar="FILE")
 parser.add_argument("-q", "--quiet",
                     action="store_false", dest="verbose", default=True,
                     help="don't print status messages to stdout.")
+parser.add_argument("-g", "--generate",
+                    action="store_true", dest="generateConfig", default=False,
+                    help="generate a new configruation file, optionally specify path and filename with --config argument.")
 args = parser.parse_args()
 
-config = Config()
-if args.filename:
-    config = config.readconfig(filename=args.filename)
-else:
-    config = config.readconfig()
 
+### Prepare/Load program config
+config = Config()
+
+config.fileName = os.path.join(os.path.dirname(__file__), config.fileName)
+
+if args.filename:
+    if args.generateConfig:
+        if config.createConfigIfMissing(args.filename):
+            exit(f"New configuration file generated at {args.filename}")
+        else:
+            exit(f"{config.fileName} does already exist")
+    else:
+        config = config.readConfig(args.filename)
+    
+else:
+    # If program runs with default config
+    if args.generateConfig:
+        if config.createConfigIfMissing(config.fileName):
+            exit(f"New configuration file generated at {config.fileName}")
+        else:
+            exit(f"{config.fileName} does already exist")
+    else:
+        config = config.readConfig(config.fileName)
 
 collectedFiles = []
 foundFiles = []
@@ -49,15 +72,14 @@ foundFiles = [x for sublist in foundFiles for x in sublist]
 if foundFiles:
     if args.verbose:
         fileCount = len(foundFiles)
-        counter = 1
+        counter = 0
         print(f"⬇ Downloading {len(foundFiles)} files...") 
 
     for file in foundFiles:  
 
         if args.verbose:
-            
-            print(f"{counter}/{fileCount} - {file[0]}")
             counter+=1
+            print(f"{counter}/{fileCount} - {file[0]}")
 
         collectedFiles.append(
             vouchercollector.downloadAttachements(file, tmpDir.name)
@@ -66,15 +88,15 @@ if foundFiles:
 if collectedFiles:
     if args.verbose:
         fileCount = len(collectedFiles)
-        counter = 1
+        counter = 0
         print(f"\n⬆ Uploading {fileCount} files...")
 
     for file in collectedFiles:
         fileName = file[1]
 
         if args.verbose:
-            print(f"{counter}/{fileCount} - {fileName}")
             counter+=1
+            print(f"{counter}/{fileCount} - {fileName}")
 
         voucherupload.fileUpload(tmpDir.name, fileName)
 
