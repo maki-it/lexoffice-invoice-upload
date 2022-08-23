@@ -31,4 +31,4 @@ class LexofficeUpload:
             c.close()
 
         except Exception as e:
-            exit("Error: File upload failed.\n" + str(e))
+            exit("Error: File upload failed\n\n" + str(e))
