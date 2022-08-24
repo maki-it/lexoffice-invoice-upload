@@ -30,7 +30,7 @@ class AttachementCollector:
             self.imap.starttls(ssl_context=tls_context)
         
         else:
-            exit("Error: ['Mail']['method'] in config must be set to either SSL or STARTTLS")
+            exit("Error: ['Mail']['encryption'] in config must be set to either SSL or STARTTLS")
 
         try:
             self.imap.login(self.config['Mail']['username'], self.config['Mail']['password'])
