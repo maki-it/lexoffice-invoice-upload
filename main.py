@@ -27,10 +27,10 @@ def getArguments():
 
     parser.add_argument("-l","--loop", "--continuous",
                         action="store_true", dest="runContinuously", default=False,
-                        help="run this program continuously without exiting. See --intervall if you want to change the default of every 120 seconds.")
+                        help="run this program continuously without exiting. See --intervall to change the default 120 seconds intervall.")
 
     parser.add_argument("-i", "--intervall", dest="intervall",
-                        help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds", metavar="SECONDS", default=120)
+                        help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.", metavar="SECONDS", default=120)
 
     return parser.parse_args()
 
