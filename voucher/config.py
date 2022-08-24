@@ -16,7 +16,7 @@ class Config:
             fileName = self.fileName
 
         if not os.path.isfile(fileName):
-            exit(f"Error: {fileName} not found")
+            exit(f"Error: config file '{fileName}' not found")
         else:
             self.config.read(fileName)
             for topic in self.config:
