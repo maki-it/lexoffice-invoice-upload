@@ -8,11 +8,10 @@ class AttachementCollector:
     """
     A class for downloading mail attachements.
     """
-    def __init__(self, config) -> None:
-        self.config = config
+    def __init__(self) -> None:
         self.downloadStarted = False
 
-    def login(self) -> None:
+    def login(self, username: str, password: str, host: str, port: int, encryptionMethod: str) -> None:
         """
         Login to mail server with either SSL or STARTTLS\n
         Set the port accordingly. Normally it is:
@@ -20,20 +19,20 @@ class AttachementCollector:
         - 143 for STARTTLS
         """
 
-        if self.config['Mail']['encryption'].lower() == 'ssl':
-            self.imap = imaplib.IMAP4_SSL(self.config['Mail']['host'], self.config['Mail']['port'])
+        if encryptionMethod.lower() == 'ssl':
+            self.imap = imaplib.IMAP4_SSL(host, port)
         
-        elif self.config['Mail']['encryption'].lower() == 'starttls':
+        elif encryptionMethod.lower() == 'starttls':
             from ssl import create_default_context
             tls_context = create_default_context()
-            self.imap = imaplib.IMAP4(self.config['Mail']['host'], self.config['Mail']['port'])
+            self.imap = imaplib.IMAP4(host, port)
             self.imap.starttls(ssl_context=tls_context)
         
         else:
             exit("Error: ['Mail']['encryption'] in config must be set to either SSL or STARTTLS")
 
         try:
-            self.imap.login(self.config['Mail']['username'], self.config['Mail']['password'])
+            self.imap.login(username, password)
         except self.imap.error as e:
             if "AUTHENTICATIONFAILED" in str(e):
                 exit("Error: Authentication to mailbox failed")

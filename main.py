@@ -56,10 +56,10 @@ fileExtensionFilter = config['Mail']['extensionsToCheck'].lower().split(',')
 subjectFilter = config['Mail']['subjectsToCheck'].split(',')
 tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
 
-vouchercollector = AttachementCollector(config=config)
+vouchercollector = AttachementCollector()
 voucherupload = LexofficeUpload(apiToken=str(config['Lexoffice']['accessToken']))
 
-vouchercollector.login()
+vouchercollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
 for mailDir in mailDirs: 
     vouchercollector.select(mailDir)
