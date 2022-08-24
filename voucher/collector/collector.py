@@ -51,7 +51,11 @@ class AttachementCollector:
 
     def searchMails(self, filter: str) -> tuple[str, list[bytes | None]]:
         """Search for mails in selected mail directory with filter"""
-        return self.imap.search(None, filter)
+        try:
+            return self.imap.search(None, filter)
+        except self.imap.error as e:
+            print("Error with ['Mail']['filter'] configuration:")
+            raise SystemExit(e)
 
     def searchAttachements(self, mails: list, mailDir: str, fileExtensionFilter: tuple = (".pdf"), subjectFilter: tuple = ()) -> list:
         """Search given mails for attachements with applied filter"""
