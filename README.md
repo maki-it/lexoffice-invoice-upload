@@ -38,9 +38,12 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 4. Mails in specified maildir will automatically be searched for attachements with the configured file extension, then downloaed und uploaded to Lexoffice via their API.
 
 ### CLI Arguments
-- `-c`, `--config` specify the config file to use. If nothing is specified, `./config.ini` will be used.
+- `-h`, `--help` show the help message
+- `-c FILE`, `--config FILE` specify the config file to use. If nothing is specified, `./config.ini` will be used.
 - `-q`, `--quiet` don't print status messages to stdout.
 - `-g`, `--generate` generate a new configruation file, optionally specify path and filename with `--config` argument.
+- `-l`, `--loop`, `--continuous` specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds
+- `-i SECONDS`, `--intervall SECONDS` specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.
 
 ### Multiple config files
 
