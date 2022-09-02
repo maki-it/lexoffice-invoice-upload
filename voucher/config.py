@@ -17,14 +17,19 @@ class Config:
 
         if not os.path.isfile(fileName):
             exit(f"Error: config file '{fileName}' not found")
+        elif os.stat(fileName).st_size == 0:
+            exit(f"Error: config file '{fileName}' is empty")
         else:
-            self.config.read(fileName)
-            for topic in self.config:
-                for field in topic:
-                    if field == '':
-                        exit(f"Error: ['{topic}']['{field}'] must not be empty")
+            try:
+                self.config.read(fileName)
+                for topic in self.config:
+                    for field in topic:
+                        if field == '':
+                            exit(f"Error: ['{topic}']['{field}'] must not be empty")
 
-            return self.config
+                return self.config
+            except configparser.MissingSectionHeaderError as e:
+                exit(f"Error: File structure not valid: {e}")
 
     def createConfigIfMissing(self, fileName: str = '') -> bool:
         """Create default configuration file if missing"""

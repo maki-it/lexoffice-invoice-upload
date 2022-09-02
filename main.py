@@ -5,17 +5,26 @@ import sys
 sys.dont_write_bytecode = True
 
 import os
+import signal
 import tempfile
 from argparse import ArgumentParser
 from time import sleep
+from glob import glob
 from columnar import columnar
+from datetime import datetime
 from voucher import Config, AttachementCollector, LexofficeUpload
+
+
+### Functions
+
+def handle_sigterm(*args):
+    raise KeyboardInterrupt()
 
 def getArguments():
     """Prepare program arguments"""
     parser = ArgumentParser(description="Upload your vouchers/invoices from email attachements to Lexoffice.")
     parser.add_argument("-c", "--config", dest="filename",
-                        help="specify the config file to use. If nothing is specified, ./config.ini will be used.", metavar="FILE", default="config.ini")
+                        help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
                         
     parser.add_argument("-q", "--quiet",
                         action="store_false", dest="verbose", default=True,
@@ -34,21 +43,21 @@ def getArguments():
 
     return parser.parse_args()
 
-
-def loadConfig():
+def loadConfig(configFile = ''):
     """Prepare/Load program config"""
     config = Config()
 
     config.fileName = os.path.join(os.path.dirname(__file__), config.fileName)
 
-    if args.filename:
+    if configFile:
         if args.generateConfig:
-            if config.createConfigIfMissing(args.filename):
-                exit(f"New configuration file generated at {args.filename}")
+            if config.createConfigIfMissing(configFile):
+                print(f"New configuration file generated at {configFile}")
+                exit()
             else:
                 exit(f"{config.fileName} does already exist")
         else:
-            return config.readConfig(args.filename)
+            return config.readConfig(configFile)
         
     else:
         # If program runs with default config
@@ -60,6 +69,8 @@ def loadConfig():
         else:
             return config.readConfig(config.fileName)
 
+def get_timestamp():
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def main(config, runContinuously: bool = False):
     vouchercollector = AttachementCollector()
@@ -71,7 +82,6 @@ def main(config, runContinuously: bool = False):
     fileExtensionFilter = config['Mail']['extensionsToCheck'].lower().split(',')
     subjectFilter = config['Mail']['subjectsToCheck'].split(',')
     tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
-
 
     vouchercollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
@@ -87,7 +97,7 @@ def main(config, runContinuously: bool = False):
         if args.verbose:
             fileCount = len(foundFiles)
             counter = 0
-            print(f"⬇ Downloading {len(foundFiles)} files...") 
+            print(f"\n⬇ Downloading {len(foundFiles)} files...") 
 
         for file in foundFiles:  
 
@@ -119,30 +129,54 @@ def main(config, runContinuously: bool = False):
             print("")
             print(f"SUMMARY - {counter} processed files")
             headers = ['Mail Directory', 'Filename', 'Mail Subject', 'Mail From', 'Mail  Send Date']
-            table = columnar(collectedFiles, headers, no_borders=True)
+            table = columnar(collectedFiles, headers, no_borders=False, max_column_width=None)
             print(table)
     else:
-        if args.verbose and not runContinuously:
+        if args.verbose: #and not runContinuously:
             print("No new files found.")
 
     vouchercollector.logout()
     tmpDir.cleanup()
 
-if __name__ == "__main__":
-    args = getArguments()
-    config = loadConfig()
 
-    if args.runContinuously:
-        print(f"Starting in continuous mode with {args.intervall} seconds intervall.\nThis ommits the 'No new files found.' message.")
+### Run
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, handle_sigterm)
+    args = getArguments()
+
+    try:
+        if glob(args.filename[0]):
+            fileNames = [glob(filename)[0] for filename in args.filename if glob(filename)]
+        else:
+            raise TypeError
+    except TypeError:
+        try:
+            fileNames = args.filename.split()
+        except AttributeError:
+            fileNames = args.filename
+
+    for path in fileNames:
+        if(os.path.isdir(path)):
+            fileNames = [os.path.join(path, file) for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))]
+
+    if args.runContinuously and fileNames:
+        print(f"[{get_timestamp()}] Starting in continuous mode with {args.intervall} seconds intervall.")
         try:
             while True:
-                main(config, args.runContinuously)
+                for configFile in fileNames:
+                    print(f"[{get_timestamp()}] Running {configFile}:")
+                    main(loadConfig(configFile), args.runContinuously)
                 sleep(int(args.intervall))
         except KeyboardInterrupt:
             exit()
 
-    
     else:
-        main(config)
+        if fileNames:
+            for configFile in fileNames:
+                print(f"Running {configFile}:")
+                main(loadConfig(configFile))
+        else:
+            main(loadConfig(fileNames))
 
 exit()

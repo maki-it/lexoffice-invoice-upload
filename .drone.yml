@@ -1,0 +1,40 @@
+type: docker
+kind: pipeline
+name: default
+
+steps:
+  - name: build private image
+    image: plugins/docker
+    settings:
+      repo: cr.maki-it.corp/lexoffice-voucher-upload
+      registry: cr.maki-it.corp
+      insecure: true
+      tags:
+        - latest
+    
+  - name: test pycurl
+    image: cr.maki-it.corp/lexoffice-voucher-upload:latest
+    commands:
+      - python3 /app/main.py --generate --config /app/config/test.ini
+      - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1 | grep 'Error: Authentication to mailbox failed'" 
+
+  - name: Recreate live testing
+    image: alpine/curl:latest
+    commands:
+      - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
+
+  - name: build public image
+    image: plugins/docker
+    settings:
+      repo: kimdrechsel/lexoffice-voucher-upload
+      username: kimdrechsel
+      password:
+        from_secret: dockerhub_token
+      registry: docker.io
+      tags:
+        - latest
+      when:
+        event:
+        - promote
+        target:
+        - production

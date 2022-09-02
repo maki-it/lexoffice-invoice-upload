@@ -35,11 +35,11 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 1. Install requirements `pip install -r requirements.txt`
 2. Specify your configuration in `config.ini` (you can generate a config file with `python3 main.py --generate` or `python3 main.py --generate --config /my/destination/mycustomconfig.conf`)
 3. Run `python3 main.py`
-4. Mails in specified maildir will automatically be searched for attachements with the configured file extension, then downloaed und uploaded to Lexoffice via their API.
+4. Mails in specified maildir will automatically be searched for attachements with the configured file extension, then downloaded und uploaded to Lexoffice via their API.
 
 ### CLI Arguments
 - `-h`, `--help` show the help message
-- `-c FILE`, `--config FILE` specify the config file to use. If nothing is specified, `./config.ini` will be used.
+- `-c FILE`, `--config FILE` specify the config file to use. If nothing is specified, `./config.ini` will be used. Use `*` as wildcard to specify multiple config files (`config_*.ini`)
 - `-q`, `--quiet` don't print status messages to stdout.
 - `-g`, `--generate` generate a new configruation file, optionally specify path and filename with `--config` argument.
 - `-l`, `--loop`, `--continuous` specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds
@@ -54,8 +54,12 @@ python3 main.py --generate --config /path/to/config/config_tom.ini
 python3 main.py --generate --config /path/to/config/config_lisa.ini
 python3 main.py --generate --config /path/to/config/config_joe.ini
 
-# Run program with specific configuration files
-for configfile in /path/to/config/config*.ini; do
-    python3 main.py --config $configfile >> logfile.log
-done
+# Run program with multiple configuration files
+python3 main.py --config /path/to/config/config*.ini >> logfile.log
 ```
+
+### Usage with Docker
+
+See `docker-compose.yml` for an example configuration.
+After starting the container once, it will generate a default `config.ini` in the volume `/app/config/`.
+Change the settings and then restart the container.

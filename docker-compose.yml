@@ -1,0 +1,14 @@
+version: "3"
+
+volumes:
+  config:
+
+services:
+  app:
+    image: cr.maki-it.corp/lexoffice-voucher-upload:latest
+    volumes:
+      - config:/app/config
+    environment:
+      - TZ=Europe/Berlin
+      - INTERVALL=120
+    restart: unless-stopped
