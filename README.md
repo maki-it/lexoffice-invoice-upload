@@ -63,3 +63,4 @@ python3 main.py --config /path/to/config/config*.ini >> logfile.log
 See `docker-compose.yml` for an example configuration.
 After starting the container once, it will generate a default `config.ini` in the volume `/app/config/`.
 Change the settings and then restart the container.
+You can add as many configuration files as you like to this directory and also name them as you like. 
