@@ -2,18 +2,55 @@ type: docker
 kind: pipeline
 name: default
 
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
+
 steps:
-  - name: build private image
-    image: plugins/docker
-    settings:
-      repo: cr.maki-it.corp/lexoffice-voucher-upload
-      registry: cr.maki-it.corp
-      insecure: true
-      tags:
-        - latest
+  # - name: build private image
+  #   image: plugins/docker
+  #   settings:
+  #     repo: cr.maki-it.corp/lexoffice-voucher-upload
+  #     registry: cr.maki-it.corp
+  #     insecure: true
+  #     tags:
+  #       - latest
     
+  - name: docker-build-slim
+    image: docker:dind
+    environment:
+      DRONE: "true"
+      USERNAME:
+        from_secret: gitea_cr_user
+      PASSWORD:
+        from_secret: gitea_cr_token
+      TAG: lexoffice-voucher-upload
+    commands:
+      - export TAG_WITH_VERSION=$TAG:v$DRONE_BUILD_NUMBER
+      - export TAG_WITH_VERSION_SLIM=$TAG_WITH_VERSION-slim
+      - sleep 8 # give docker enough time to start
+      # Pull recently built image from docker hub
+      - docker pull $TAG_WITH_VERSION
+      # Optionally, rebuild 'fat' image from Dockerfile
+      # - docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/app dslim/docker-slim build --dockerfile Dockerfile --tag $TAG_WITH_VERSION /app
+      - docker run -v /var/run/docker.sock:/var/run/docker.sock dslim/docker-slim build --tag $TAG_WITH_VERSION_SLIM $TAG_WITH_VERSION
+      - docker images
+      - docker login git.maki-it.corp -u $USERNAME -p $PASSWORD
+      - docker push $TAG_WITH_VERSION_SLIM
+    volumes:
+      - name: dockersock
+        path: /var/run
+
   - name: test pycurl
-    image: cr.maki-it.corp/lexoffice-voucher-upload:latest
+    image: git.maki-it.corp/lexoffice-voucher-upload:latest
     commands:
       - python3 /app/main.py --generate --config /app/config/test.ini
       - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1 | grep 'Error: Authentication to mailbox failed'" 
