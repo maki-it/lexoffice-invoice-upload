@@ -1,6 +1,6 @@
 # Lexoffice Voucher Upload
 
-Upload your vouchers/invoices from email attachements to Lexoffice.
+Upload your vouchers/invoices from email attachements automatically to Lexoffice.
 
 ## Requirements
 - See `requirements.txt`
@@ -42,7 +42,7 @@ Upload your vouchers/invoices from email attachements to Lexoffice.
 - `-c FILE`, `--config FILE` specify the config file to use. If nothing is specified, `./config.ini` will be used. Use `*` as wildcard to specify multiple config files (`config_*.ini`)
 - `-q`, `--quiet` don't print status messages to stdout.
 - `-g`, `--generate` generate a new configruation file, optionally specify path and filename with `--config` argument.
-- `-l`, `--loop`, `--continuous` specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds
+- `-l`, `--loop`, `--continuous` Enable loop/continuous mode. In this mode, the script runs through the given configuration(s) in an infinite loop. The default interval between each run is 120 seconds.
 - `-i SECONDS`, `--intervall SECONDS` specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.
 
 ### Multiple config files
