@@ -18,7 +18,7 @@ steps:
       INTERVALL: 60
     commands:
       - python3 /app/main.py --generate --config /app/config/test.ini
-      - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1" 
+      - "python3 /app/main.py --config /app/config/test.ini" 
 
   - name: Recreate live testing
     image: alpine/curl:latest
