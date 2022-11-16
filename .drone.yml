@@ -14,6 +14,8 @@ steps:
     
   - name: test pycurl
     image: cr.maki-it.corp/lexoffice-voucher-upload:latest
+    environment:
+      INTERVALL: 60
     commands:
       - python3 /app/main.py --generate --config /app/config/test.ini
       - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1" 
