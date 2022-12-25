@@ -6,14 +6,17 @@ steps:
   - name: build private image
     image: plugins/docker
     settings:
-      repo: cr.maki-it.corp/lexoffice-voucher-upload
-      registry: cr.maki-it.corp
-      insecure: true
+      repo: git.maki-it.corp/kim/lexoffice-voucher-upload
+      registry: git.maki-it.corp
+      username: 
+        from_secret: registry_username
+      password:
+        from_secret: registry_password
       tags:
         - latest
     
   - name: test pycurl
-    image: cr.maki-it.corp/lexoffice-voucher-upload:latest
+    image: git.maki-it.corp/kim/lexoffice-voucher-upload:latest
     commands:
       - python3 /app/main.py --generate --config /app/config/test.ini
       - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1" 
