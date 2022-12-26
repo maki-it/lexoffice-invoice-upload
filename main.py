@@ -27,7 +27,7 @@ def getArguments():
         description="Upload your vouchers/invoices from email attachements to Lexoffice.", 
         epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload"
         )
-        
+
     parser.add_argument("-c", "--config", dest="filename",
                         help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
                         
@@ -142,7 +142,7 @@ def main(config, runContinuously: bool = False):
             print(table)
     else:
         if args.verbose: #and not runContinuously:
-            print("No new files found.")
+            print(f"[{get_timestamp()}] No new files found.")
 
     vouchercollector.logout()
     tmpDir.cleanup()
