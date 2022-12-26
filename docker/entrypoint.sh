@@ -4,7 +4,7 @@ set -e
 
 trap "echo Exiting...; exit 0" EXIT TERM
 
-if [[ "$*" =~ 'appstart' ]]; then
+if [[ "$*" =~ 'python' ]]; then
     BASE_DIR="/app"
     CONF_DIR="$BASE_DIR/config"
 
