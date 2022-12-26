@@ -15,6 +15,8 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 
 FROM base
 
+USER 101
+
 ENV TZ=Europe/Berlin \
     INTERVALL=120
 
@@ -26,8 +28,6 @@ VOLUME /app/config
 RUN chmod +x /app/docker/entrypoint.sh && \
     chmod +x /app/main.py && \
     rm /app/config.ini
-
-USER 101
 
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
 CMD appstart
