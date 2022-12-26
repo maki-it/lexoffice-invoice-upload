@@ -41,7 +41,7 @@ def getArguments():
     parser.add_argument("-i", "--intervall", dest="intervall",
                         help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.", metavar="SECONDS", default=120)
 
-    parser.add_argument("--run-once",
+    parser.add_argument("-o", "--run-once",
                         action="store_true", dest="runOnce", default=False,
                         help="Only for debugging. Stops the loop in continuous mode.")
 
