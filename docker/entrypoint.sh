@@ -30,6 +30,7 @@ if [[ "$*" =~ 'python' ]]; then
     eval "set -- $1"
     fi
 
+    echo "Executing command: $@"
     exec "$@"
 else
     exec "$@"
