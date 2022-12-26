@@ -23,6 +23,7 @@ steps:
       FILEPATH: /app/config/test.ini
       DEBUG: True
     commands:
+      - cat /app/main.py
       - python3 /app/main.py --generate --config $FILEPATH
       - echo "$TESTCONFIG" > $FILEPATH
       - "python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
