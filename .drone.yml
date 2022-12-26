@@ -17,9 +17,14 @@ steps:
     
   - name: test pycurl
     image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
+    environment:
+      TESTCONFIG:
+        from_secret: testconfig.ini
+      FILEPATH: /app/config/test.ini
     commands:
-      - python3 /app/main.py --generate --config /app/config/test.ini
-      - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1" 
+      - python3 /app/main.py --generate --config $FILEPATH
+      - echo $TESTCONFIG > $FILEPATH
+      - "python3 /app/main.py --config $FILEPATH 2>&1" 
 
   - name: Recreate live testing
     image: alpine/curl:latest
