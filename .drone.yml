@@ -13,10 +13,10 @@ steps:
       password:
         from_secret: registry_password
       tags:
-        - latest
+        - develop
     
   - name: test pycurl
-    image: git.maki-it.corp/kim/lexoffice-voucher-upload:latest
+    image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
     commands:
       - python3 /app/main.py --generate --config /app/config/test.ini
       - "python3 /app/main.py --config /app/config/test.ini --continuous --intervall $INTERVALL 2>&1" 
