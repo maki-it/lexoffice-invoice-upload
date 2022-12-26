@@ -15,8 +15,6 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 
 FROM base
 
-USER 101
-
 ENV TZ=Europe/Berlin \
     INTERVALL=120
 
