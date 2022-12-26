@@ -31,7 +31,7 @@ if [[ "$*" =~ 'appstart' ]]; then
     # fi
 
     # exec "$@"
-    exec "/bin/sh -c 'python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL'"
+    exec "/bin/sh -c python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL"
 else
     exec "$@"
 fi
