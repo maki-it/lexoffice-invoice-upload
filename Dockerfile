@@ -27,5 +27,7 @@ RUN chmod +x /app/docker/entrypoint.sh && \
     chmod +x /app/main.py && \
     rm /app/config.ini
 
+USER 101
+
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
 CMD appstart
