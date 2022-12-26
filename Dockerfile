@@ -16,7 +16,8 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 FROM base
 
 ENV TZ=Europe/Berlin \
-    INTERVALL=120
+    INTERVALL=120 \
+    PYTHONUNBUFFERED=1
 
 COPY --from=builder /install /usr/local
 COPY . /app/

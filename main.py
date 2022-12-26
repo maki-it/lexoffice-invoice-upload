@@ -22,13 +22,22 @@ def handle_sigterm(*args):
 
 def getArguments():
     """Prepare program arguments"""
-    parser = ArgumentParser(description="Upload your vouchers/invoices from email attachements to Lexoffice.")
+    parser = ArgumentParser(
+        prog="Lexoffice Voucher Upload", 
+        description="Upload your vouchers/invoices from email attachements to Lexoffice.", 
+        epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload"
+        )
+
     parser.add_argument("-c", "--config", dest="filename",
                         help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
                         
     parser.add_argument("-q", "--quiet",
                         action="store_false", dest="verbose", default=True,
                         help="don't print status messages to stdout.")
+
+    parser.add_argument("--run-once",
+                        action="store_true", dest="runOnce", default=False,
+                        help="Only for debugging. Stops the loop in continuous mode.")
 
     parser.add_argument("-g", "--generate",
                         action="store_true", dest="generateConfig", default=False,
@@ -133,7 +142,7 @@ def main(config, runContinuously: bool = False):
             print(table)
     else:
         if args.verbose: #and not runContinuously:
-            print("No new files found.")
+            print(f"[{get_timestamp()}] No new files found.")
 
     vouchercollector.logout()
     tmpDir.cleanup()
@@ -167,6 +176,10 @@ if __name__ == "__main__":
                 for configFile in fileNames:
                     print(f"[{get_timestamp()}] Running {configFile}:")
                     main(loadConfig(configFile), args.runContinuously)
+
+                if args.runOnce:
+                    exit()
+
                 sleep(int(args.intervall))
         except KeyboardInterrupt:
             exit()

@@ -4,7 +4,7 @@ set -e
 
 trap "echo Exiting...; exit 0" EXIT TERM
 
-if [[ "$*" =~ 'app_start' ]]; then
+if [[ "$*" =~ 'python' ]]; then
     BASE_DIR="/app"
     CONF_DIR="$BASE_DIR/config"
 
@@ -16,7 +16,7 @@ if [[ "$*" =~ 'app_start' ]]; then
 
     if [ -z "$(ls -A $CONF_DIR 2>/dev/null)" ]
     then
-        echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] WARNING: No config file found in $CONF_DIR. I will generate one for you.\nPlease change the settings to your needs and start the container again.\n"
+        echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] INFO: No config file found in $CONF_DIR. I will generate one for you.\nPlease change the settings to your needs and start the container again.\n"
         python3 $BASE_DIR/main.py --generate --config $CONF_DIR/config.ini
         exit
     fi
