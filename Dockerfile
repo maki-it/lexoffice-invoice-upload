@@ -16,7 +16,8 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 FROM base
 
 ENV TZ=Europe/Berlin \
-    INTERVALL=120
+    INTERVALL=120 \
+    PYTHONUNBUFFERED=1
 
 COPY --from=builder /install /usr/local
 COPY . /app/
@@ -28,4 +29,4 @@ RUN chmod +x /app/docker/entrypoint.sh && \
     rm /app/config.ini
 
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
-CMD python3 -u /app/main.py --config /app/config/ --continuous --intervall $INTERVALL
+CMD python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL
