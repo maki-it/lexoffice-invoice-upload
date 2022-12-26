@@ -4,6 +4,11 @@ name: default
 
 steps:
   - name: Build private image
+    when:
+      event:
+        exclude:
+        - promote
+        - rollback
     image: plugins/docker
     settings:
       repo: git.maki-it.corp/kim/lexoffice-voucher-upload
@@ -16,6 +21,11 @@ steps:
         - develop
     
   - name: Test
+    when:
+      event:
+        exclude:
+        - promote
+        - rollback
     image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
     pull: always
     environment:
@@ -30,6 +40,11 @@ steps:
       - "/app/docker/entrypoint.sh python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
 
   - name: Recreate live testing
+    when:
+      event:
+        exclude:
+        - promote
+        - rollback
     image: alpine/curl:latest
     commands:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
@@ -47,5 +62,6 @@ steps:
     when:
       event:
       - promote
+      - rollback
       target:
       - production
