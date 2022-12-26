@@ -22,7 +22,12 @@ def handle_sigterm(*args):
 
 def getArguments():
     """Prepare program arguments"""
-    parser = ArgumentParser(prod="Lexoffice Voucher Upload", description="Upload your vouchers/invoices from email attachements to Lexoffice.", epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload")
+    parser = ArgumentParser(
+        prog="Lexoffice Voucher Upload", 
+        description="Upload your vouchers/invoices from email attachements to Lexoffice.", 
+        epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload"
+        )
+        
     parser.add_argument("-c", "--config", dest="filename",
                         help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
                         
