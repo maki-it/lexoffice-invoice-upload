@@ -22,13 +22,17 @@ def handle_sigterm(*args):
 
 def getArguments():
     """Prepare program arguments"""
-    parser = ArgumentParser(description="Upload your vouchers/invoices from email attachements to Lexoffice.")
+    parser = ArgumentParser(prod="Lexoffice Voucher Upload", description="Upload your vouchers/invoices from email attachements to Lexoffice.", epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload")
     parser.add_argument("-c", "--config", dest="filename",
                         help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
                         
     parser.add_argument("-q", "--quiet",
                         action="store_false", dest="verbose", default=True,
                         help="don't print status messages to stdout.")
+
+    parser.add_argument("--run-once",
+                        action="store_true", dest="runOnce", default=False,
+                        help="Only for debugging. Stops the loop in continuous mode.")
 
     parser.add_argument("-g", "--generate",
                         action="store_true", dest="generateConfig", default=False,
@@ -40,10 +44,6 @@ def getArguments():
 
     parser.add_argument("-i", "--intervall", dest="intervall",
                         help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.", metavar="SECONDS", default=120)
-
-    parser.add_argument("-o", "--run-once",
-                        action="store_true", dest="runOnce", default=False,
-                        help="Only for debugging. Stops the loop in continuous mode.")
 
     return parser.parse_args()
 
