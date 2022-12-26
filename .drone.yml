@@ -3,7 +3,7 @@ kind: pipeline
 name: default
 
 steps:
-  - name: build private image
+  - name: Build private image
     image: plugins/docker
     settings:
       repo: git.maki-it.corp/kim/lexoffice-voucher-upload
@@ -15,8 +15,9 @@ steps:
       tags:
         - develop
     
-  - name: test pycurl
+  - name: Test
     image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
+    pull: always
     environment:
       TESTCONFIG:
         from_secret: testconfig.ini
