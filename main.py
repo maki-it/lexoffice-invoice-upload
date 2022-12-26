@@ -41,6 +41,10 @@ def getArguments():
     parser.add_argument("-i", "--intervall", dest="intervall",
                         help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.", metavar="SECONDS", default=120)
 
+    parser.add_argument("--run-once",
+                        action="store_true", dest="runOnce", default=False,
+                        help="Only for debugging. Stops the loop in continuous mode.")
+
     return parser.parse_args()
 
 def loadConfig(configFile = ''):
@@ -167,6 +171,10 @@ if __name__ == "__main__":
                 for configFile in fileNames:
                     print(f"[{get_timestamp()}] Running {configFile}:")
                     main(loadConfig(configFile), args.runContinuously)
+
+                if args.runOnce:
+                    exit()
+
                 sleep(int(args.intervall))
         except KeyboardInterrupt:
             exit()

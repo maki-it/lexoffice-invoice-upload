@@ -21,10 +21,11 @@ steps:
       TESTCONFIG:
         from_secret: testconfig.ini
       FILEPATH: /app/config/test.ini
+      DEBUG: True
     commands:
       - python3 /app/main.py --generate --config $FILEPATH
       - echo "$TESTCONFIG" > $FILEPATH
-      - "python3 /app/main.py --config $FILEPATH 2>&1" 
+      - "python3 /app/main.py --config $FILEPATH --continuous --run-once --intervall $INTERVALL 2>&1" 
 
   - name: Recreate live testing
     image: alpine/curl:latest
