@@ -23,7 +23,7 @@ steps:
       FILEPATH: /app/config/test.ini
     commands:
       - python3 /app/main.py --generate --config $FILEPATH
-      - echo $TESTCONFIG > $FILEPATH
+      - echo "$TESTCONFIG" > $FILEPATH
       - "python3 /app/main.py --config $FILEPATH 2>&1" 
 
   - name: Recreate live testing
