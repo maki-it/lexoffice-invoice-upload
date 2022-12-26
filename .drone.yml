@@ -34,18 +34,18 @@ steps:
     commands:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
 
-  - name: build public image
-    image: plugins/docker
-    settings:
-      repo: kimdrechsel/lexoffice-voucher-upload
-      username: kimdrechsel
-      password:
-        from_secret: dockerhub_token
-      registry: docker.io
-      tags:
-        - latest
-      when:
-        event:
-        - promote
-        target:
-        - production
+  # - name: build public image
+  #   image: plugins/docker
+  #   settings:
+  #     repo: kimdrechsel/lexoffice-voucher-upload
+  #     username: kimdrechsel
+  #     password:
+  #       from_secret: dockerhub_token
+  #     registry: docker.io
+  #     tags:
+  #       - latest
+  #     when:
+  #       event:
+  #       - promote
+  #       target:
+  #       - production
