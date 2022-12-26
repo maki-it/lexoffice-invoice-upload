@@ -31,7 +31,7 @@ if [[ "$*" =~ 'python' ]]; then
     fi
 
     echo "Executing command: $@"
-    exec "$@"
+    exec "$@ 2>&1"
 else
     exec "$@"
 fi
