@@ -25,13 +25,12 @@ if [[ "$*" =~ 'appstart' ]]; then
     ls -A $CONF_DIR
 
     # convert `/bin/sh -c "command"` to `command`
-    # if [ $# -gt 1 ] && [ x"$1" = x"/bin/sh" ] && [ x"$2" = x"-c" ]; then
-    # shift 2
-    # eval "set -- $1"
-    # fi
+    if [ $# -gt 1 ] && [ x"$1" = x"/bin/sh" ] && [ x"$2" = x"-c" ]; then
+    shift 2
+    eval "set -- $1"
+    fi
 
-    # exec "$@"
-    exec "/bin/sh -c python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL"
+    exec "$@"
 else
     exec "$@"
 fi

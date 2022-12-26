@@ -28,4 +28,4 @@ RUN chmod +x /app/docker/entrypoint.sh && \
     rm /app/config.ini
 
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
-CMD appstart
+CMD python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL
