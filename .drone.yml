@@ -53,11 +53,11 @@ steps:
       registry: docker.io
       tags:
         - latest
-      when:
-        event:
-        - promote
-        - rollback
-        target:
-        - production
-        branch:
-        - master
+    when:
+      event:
+      - promote
+      - rollback
+      target:
+      - production
+      branch: 
+      - master
