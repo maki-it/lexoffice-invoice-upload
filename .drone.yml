@@ -14,6 +14,9 @@ steps:
         from_secret: registry_password
       tags:
         - develop
+    when:
+      branch: 
+      - develop
     
   - name: Test
     image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
@@ -28,24 +31,31 @@ steps:
       - python3 /app/main.py --generate --config $FILEPATH
       - echo "$TESTCONFIG" > $FILEPATH
       - "/app/docker/entrypoint.sh python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
+    when:
+      branch: 
+      - develop
 
   - name: Recreate live testing
     image: alpine/curl:latest
     commands:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
+    when:
+      branch: 
+      - develop
 
-  # - name: build public image
-  #   image: plugins/docker
-  #   settings:
-  #     repo: kimdrechsel/lexoffice-voucher-upload
-  #     username: kimdrechsel
-  #     password:
-  #       from_secret: dockerhub_token
-  #     registry: docker.io
-  #     tags:
-  #       - latest
-  #     when:
-  #       event:
-  #       - promote
-  #       target:
-  #       - production
+  - name: build public image
+    image: plugins/docker
+    settings:
+      repo: kimdrechsel/lexoffice-voucher-upload
+      username: kimdrechsel
+      password:
+        from_secret: dockerhub_token
+      registry: docker.io
+      tags:
+        - latest
+      when:
+        event:
+        - promote
+        - rollback
+        target:
+        - production
