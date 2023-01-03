@@ -1,6 +1,6 @@
-# Lexoffice Voucher Upload
+# Lexoffice Invoice Upload
 
-Upload your vouchers/invoices from email attachements automatically to Lexoffice.
+Upload your invoices from email attachements automatically to Lexoffice.
 
 ## Requirements
 - See `requirements.txt`

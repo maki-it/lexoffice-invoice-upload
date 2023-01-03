@@ -6,7 +6,7 @@ steps:
   - name: Build private image
     image: plugins/docker
     settings:
-      repo: git.maki-it.corp/kim/lexoffice-voucher-upload
+      repo: git.maki-it.corp/kim/lexoffice-invoice-upload
       registry: git.maki-it.corp
       username: 
         from_secret: registry_username
@@ -19,7 +19,7 @@ steps:
       - develop
     
   - name: Test
-    image: git.maki-it.corp/kim/lexoffice-voucher-upload:develop
+    image: git.maki-it.corp/kim/lexoffice-invoice-upload:develop
     pull: always
     environment:
       TESTCONFIG:
@@ -36,11 +36,6 @@ steps:
       - develop
 
   - name: Recreate live testing
-    when:
-      event:
-        exclude:
-        - promote
-        - rollback
     image: alpine/curl:latest
     commands:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
@@ -51,8 +46,8 @@ steps:
   - name: build public image
     image: plugins/docker
     settings:
-      repo: kimdrechsel/lexoffice-voucher-upload
-      username: kimdrechsel
+      repo: makiit/lexoffice-invoice-upload
+      username: makiit
       password:
         from_secret: dockerhub_token
       registry: docker.io

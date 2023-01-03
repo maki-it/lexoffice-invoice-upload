@@ -12,7 +12,7 @@ from time import sleep
 from glob import glob
 from columnar import columnar
 from datetime import datetime
-from voucher import Config, AttachementCollector, LexofficeUpload
+from invoice import Config, AttachementCollector, LexofficeUpload
 
 
 ### Functions
@@ -23,9 +23,9 @@ def handle_sigterm(*args):
 def getArguments():
     """Prepare program arguments"""
     parser = ArgumentParser(
-        prog="Lexoffice Voucher Upload", 
-        description="Upload your vouchers/invoices from email attachements to Lexoffice.", 
-        epilog="For more informations see https://github.com/Maki-IT/lexoffice-voucher-upload"
+        prog="Lexoffice Invoice Upload", 
+        description="Upload your invoices from email attachements to Lexoffice.", 
+        epilog="For more informations see https://github.com/Maki-IT/lexoffice-invoice-upload"
         )
 
     parser.add_argument("-c", "--config", dest="filename",
@@ -82,8 +82,8 @@ def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def main(config, runContinuously: bool = False):
-    vouchercollector = AttachementCollector()
-    voucherupload = LexofficeUpload(apiToken=str(config['Lexoffice']['accessToken']))
+    invoicecollector = AttachementCollector()
+    invoiceupload = LexofficeUpload(apiToken=str(config['Lexoffice']['accessToken']))
     collectedFiles = []
     foundFiles = []
     mailDirs = config['Mail']['maildir'].split(',')
@@ -92,12 +92,12 @@ def main(config, runContinuously: bool = False):
     subjectFilter = config['Mail']['subjectsToCheck'].split(',')
     tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
 
-    vouchercollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
+    invoicecollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
     for mailDir in mailDirs: 
-        vouchercollector.select(mailDir)
-        status, mails = vouchercollector.searchMails(mailFilter)
-        foundFiles.append(vouchercollector.searchAttachements(mails, mailDir, tuple(fileExtensionFilter), tuple(subjectFilter)))
+        invoicecollector.select(mailDir)
+        status, mails = invoicecollector.searchMails(mailFilter)
+        foundFiles.append(invoicecollector.searchAttachements(mails, mailDir, tuple(fileExtensionFilter), tuple(subjectFilter)))
 
     # Merge sublists of each maildir into one list
     foundFiles = [x for sublist in foundFiles for x in sublist]
@@ -115,7 +115,7 @@ def main(config, runContinuously: bool = False):
                 print(f"{counter}/{fileCount} - {file[0]}")
 
             collectedFiles.append(
-                vouchercollector.downloadAttachements(file, tmpDir.name)
+                invoicecollector.downloadAttachements(file, tmpDir.name)
             )
 
     if collectedFiles:
@@ -131,7 +131,7 @@ def main(config, runContinuously: bool = False):
                 counter+=1
                 print(f"{counter}/{fileCount} - {fileName}")
 
-            voucherupload.fileUpload(tmpDir.name, fileName)
+            invoiceupload.fileUpload(tmpDir.name, fileName)
 
         
         if args.verbose and config['Default']['showTable'].lower() == 'true':
@@ -144,7 +144,7 @@ def main(config, runContinuously: bool = False):
         if args.verbose: #and not runContinuously:
             print(f"[{get_timestamp()}] No new files found.")
 
-    vouchercollector.logout()
+    invoicecollector.logout()
     tmpDir.cleanup()
 
 

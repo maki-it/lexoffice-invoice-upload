@@ -3,7 +3,7 @@ import pycurl
 
 class LexofficeUpload:
     """
-    A class for uploading invoice/voucher documents
+    A class for uploading invoice documents
     """
     def __init__(self, apiToken: str) -> None:
         self.apiUrl = 'https://api.lexoffice.io/v1/files'
