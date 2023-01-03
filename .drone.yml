@@ -47,7 +47,8 @@ steps:
     image: plugins/docker
     settings:
       repo: makiit/lexoffice-invoice-upload
-      username: makiit
+      username: 
+        from_secret: dockerhub_username
       password:
         from_secret: dockerhub_token
       registry: docker.io
