@@ -43,7 +43,7 @@ steps:
       branch: 
       - develop
 
-  - name: build public image
+  - name: push to dockerhub
     image: plugins/docker
     settings:
       repo: makiit/lexoffice-invoice-upload
@@ -52,6 +52,26 @@ steps:
       password:
         from_secret: dockerhub_token
       registry: docker.io
+      tags:
+        - latest
+    when:
+      event:
+      - promote
+      - rollback
+      target:
+      - production
+      branch: 
+      - master
+
+  - name: push to github cr
+    image: plugins/docker
+    settings:
+      repo: makiit/lexoffice-invoice-upload
+      username: 
+        from_secret: github_user
+      password:
+        from_secret: github_token
+      registry: ghcr.io
       tags:
         - latest
     when:
