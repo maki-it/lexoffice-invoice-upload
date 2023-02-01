@@ -54,6 +54,8 @@ steps:
       registry: docker.io
       tags:
         - latest
+    depends_on:
+      - clone
     when:
       event:
       - promote
@@ -66,7 +68,7 @@ steps:
   - name: push to github cr
     image: plugins/docker
     settings:
-      repo: makiit/lexoffice-invoice-upload
+      repo: Maki-IT/lexoffice-invoice-upload
       username: 
         from_secret: github_user
       password:
@@ -74,6 +76,8 @@ steps:
       registry: ghcr.io
       tags:
         - latest
+    depends_on:
+      - clone
     when:
       event:
       - promote
