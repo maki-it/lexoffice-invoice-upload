@@ -68,7 +68,7 @@ steps:
   - name: push to github cr
     image: plugins/docker
     settings:
-      repo: maki-it/lexoffice-invoice-upload
+      repo: ghcr.io/maki-it/lexoffice-invoice-upload
       username: 
         from_secret: github_user
       password:
