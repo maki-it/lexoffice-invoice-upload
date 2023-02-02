@@ -14,6 +14,8 @@ steps:
         from_secret: registry_password
       tags:
         - develop
+    depends_on:
+      - clone
     when:
       branch: 
       - develop
@@ -31,6 +33,8 @@ steps:
       - python3 /app/main.py --generate --config $FILEPATH
       - echo "$TESTCONFIG" > $FILEPATH
       - "/app/docker/entrypoint.sh python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
+    depends_on:
+      - Build private image    
     when:
       branch: 
       - develop
@@ -39,6 +43,8 @@ steps:
     image: alpine/curl:latest
     commands:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
+    depends_on:
+      - Test
     when:
       branch: 
       - develop
