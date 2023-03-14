@@ -16,9 +16,6 @@ steps:
         - develop
     depends_on:
       - clone
-    when:
-      branch: 
-      - develop
     
   - name: Test
     image: git.maki-it.corp/kim/lexoffice-invoice-upload:develop
@@ -35,9 +32,6 @@ steps:
       - "/app/docker/entrypoint.sh python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
     depends_on:
       - Build private image    
-    when:
-      branch: 
-      - develop
 
   - name: Recreate live testing
     image: alpine/curl:latest
@@ -45,9 +39,6 @@ steps:
       - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
     depends_on:
       - Test
-    when:
-      branch: 
-      - develop
 
   - name: push to dockerhub
     image: plugins/docker
@@ -64,8 +55,11 @@ steps:
       - clone
     when:
       event:
+      - pull_request
+      - tag
       - promote
       - rollback
+      - custom
       target:
       - production
       branch: 
@@ -86,8 +80,11 @@ steps:
       - clone
     when:
       event:
+      - pull_request
+      - tag
       - promote
       - rollback
+      - custom
       target:
       - production
       branch: 
