@@ -50,7 +50,7 @@ steps:
       tags:
         - latest
     depends_on:
-      - clone
+      - Test
     when:
       event:
       - pull_request
@@ -71,7 +71,7 @@ steps:
       tags:
         - latest
     depends_on:
-      - clone
+      - Test
     when:
       event:
       - pull_request
