@@ -12,8 +12,6 @@ steps:
         from_secret: registry_username
       password:
         from_secret: registry_password
-      tags:
-        - develop
     depends_on:
       - clone
     
@@ -57,11 +55,7 @@ steps:
       event:
       - pull_request
       - tag
-      - promote
-      - rollback
       - custom
-      target:
-      - production
       branch: 
       - master
 
@@ -82,10 +76,6 @@ steps:
       event:
       - pull_request
       - tag
-      - promote
-      - rollback
       - custom
-      target:
-      - production
       branch: 
       - master
