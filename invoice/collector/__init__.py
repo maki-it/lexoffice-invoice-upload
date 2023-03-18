@@ -1,1 +1,1 @@
-from .collector import AttachementCollector
+from .collector import AttachmentCollector

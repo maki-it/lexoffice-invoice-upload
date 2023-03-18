@@ -1,6 +1,6 @@
 FROM python:3-alpine3.17 as base
 
-RUN apk --no-cache add tzdata libcurl
+RUN apk --no-cache add tzdata libcurl su-exec
 
 FROM base as builder
 
@@ -16,17 +16,22 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 FROM base
 
 ENV TZ=Europe/Berlin \
-    INTERVALL=120 \
+    CRON='*/5 * * * *' \
     PYTHONUNBUFFERED=1
 
-COPY --from=builder /install /usr/local
-COPY . /app/
 WORKDIR /app/
 VOLUME /app/config
 
+ARG USER=lexoffice-uploader
+RUN adduser --disabled-password --no-create-home $USER
+
+COPY --from=builder /install /usr/local
+COPY --chown=$USER:$USER . .
+
 RUN chmod +x /app/docker/entrypoint.sh && \
     chmod +x /app/main.py && \
-    rm /app/config.ini
+    rm /app/requirements.txt && \
+    chown -R $USER /app
 
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
-CMD python3 /app/main.py --config /app/config/ --continuous --intervall $INTERVALL
+CMD python3 /app/main.py --configfile /app/config/ --continuous --cron "$CRON"

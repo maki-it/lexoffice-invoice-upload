@@ -9,6 +9,6 @@ services:
     volumes:
       - config:/app/config
     environment:
-      - TZ=Europe/Berlin
-      - INTERVALL=120
+      TZ: Europe/Berlin
+      CRON: '*/5 * * * *'
     restart: unless-stopped

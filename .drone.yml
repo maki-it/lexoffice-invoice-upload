@@ -12,6 +12,8 @@ steps:
         from_secret: registry_username
       password:
         from_secret: registry_password
+      tags:
+        - develop
     depends_on:
       - clone
     
@@ -23,11 +25,13 @@ steps:
         from_secret: testconfig.ini
       FILEPATH: /app/config/test.ini
       DEBUG: True
+      CRON: '*/1 * * * *'
     commands:
       - python3 /app/main.py -h
-      - python3 /app/main.py --generate --config $FILEPATH
+      - python3 /app/main.py --generate --configfile $FILEPATH
       - echo "$TESTCONFIG" > $FILEPATH
-      - "/app/docker/entrypoint.sh python3 /app/main.py --config $FILEPATH --continuous --intervall $INTERVALL --run-once 2>&1" 
+      - echo "python3 /app/main.py --configfile $FILEPATH --continuous --cron '$CRON' --run-once"
+      - /app/docker/entrypoint.sh python3 /app/main.py --configfile $FILEPATH --continuous --cron "$CRON" --run-once 2>&1
     depends_on:
       - Build private image    
 

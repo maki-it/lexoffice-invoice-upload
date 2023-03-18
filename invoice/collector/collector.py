@@ -4,7 +4,7 @@ import email
 from sys import exit
 
 
-class AttachementCollector:
+class AttachmentCollector:
     """
     A class for downloading mail attachements.
     """
@@ -38,7 +38,6 @@ class AttachementCollector:
                 exit("Error: Authentication to mailbox failed")
             else:
                 exit("Error: ", str(e))
-
 
     def logout(self) -> None: 
         """Safely close the connection and logout of mail server"""
@@ -93,7 +92,6 @@ class AttachementCollector:
                             foundFiles.append((fileName, mailDir, emailMessage, part))
                         
         return foundFiles
-
 
     def downloadAttachements(self, file: list, tmpDir: str) -> list:
         """"Download attachements with specified file extensions from mail"""

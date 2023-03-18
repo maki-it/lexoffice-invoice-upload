@@ -1,0 +1,10 @@
+config.ini
+renovate.json
+setup.py
+docker-compose.yml
+Dockerfile
+.dockerignore
+.gitignore
+.editorconfig
+.github
+.drone.yml

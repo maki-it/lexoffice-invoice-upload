@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 
-#Disable pycache
+# Disable pycache
 import sys
 sys.dont_write_bytecode = True
 
 import os
 import signal
 import tempfile
+import itertools
+from cron_validator import CronScheduler, CronValidator
 from argparse import ArgumentParser
 from time import sleep
 from glob import glob
 from columnar import columnar
 from datetime import datetime
-from invoice import Config, AttachementCollector, LexofficeUpload
+from invoice import Config, AttachmentCollector, LexofficeUpload
 
 
 ### Functions
 
 def handle_sigterm(*args):
     raise KeyboardInterrupt()
+
 
 def getArguments():
     """Prepare program arguments"""
@@ -28,12 +31,12 @@ def getArguments():
         epilog="For more informations see https://github.com/Maki-IT/lexoffice-invoice-upload"
         )
 
-    parser.add_argument("-c", "--config", dest="filename",
-                        help="specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
-                        
+    parser.add_argument("-f", "--configfile", dest="filename",
+                        help="Specify the config file to use (or multiple). If nothing is specified, ./config.ini will be used. Use * as wildcard.", nargs='+', metavar="FILE", default="config.ini")
+
     parser.add_argument("-q", "--quiet",
                         action="store_false", dest="verbose", default=True,
-                        help="don't print status messages to stdout.")
+                        help="Don't print status messages to stdout.")
 
     parser.add_argument("--run-once",
                         action="store_true", dest="runOnce", default=False,
@@ -41,18 +44,21 @@ def getArguments():
 
     parser.add_argument("-g", "--generate",
                         action="store_true", dest="generateConfig", default=False,
-                        help="generate a new configruation file, optionally specify path and filename with --config argument.")
+                        help="Generate a new configruation file, optionally specify path and filename with --config argument.")
 
-    parser.add_argument("-l","--loop", "--continuous",
+    parser.add_argument("-l", "--loop", "--continuous",
                         action="store_true", dest="runContinuously", default=False,
-                        help="run this program continuously without exiting. See --intervall to change the default 120 seconds intervall.")
+                        help="Run this program continuously without exiting. See --cron to change the default 5 min intervall.")
 
-    parser.add_argument("-i", "--intervall", dest="intervall",
-                        help="specify the intervall in seconds between each run. Only takes effect in loop/continuous mode. Default is 120 seconds.", metavar="SECONDS", default=120)
+    parser.add_argument("-c", "--cron", dest="cronSchedule",
+                        help="Specify the schedule in cron-style format (minute hour day-of-month month day-of-week). See https://crontab.guru/ for examples and help about schedule expressions. Only takes effect in loop/continuous mode. Default is 5 minutes.",
+                        metavar='"m h dom mon dow"',
+                        default='*/5 * * * *')
 
     return parser.parse_args()
 
-def loadConfig(configFile = ''):
+
+def loadConfig(configFile=''):
     """Prepare/Load program config"""
     config = Config()
 
@@ -78,11 +84,37 @@ def loadConfig(configFile = ''):
         else:
             return config.readConfig(config.fileName)
 
+
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-def main(config, runContinuously: bool = False):
-    invoicecollector = AttachementCollector()
+
+def get_configfiles(filenameList):
+    try:
+        if glob(filenameList[0]):
+            fileNames = [glob(filename)[0] for filename in filenameList if glob(filename)]
+        else:
+            raise TypeError
+    except TypeError:
+        try:
+            fileNames = filenameList.split()
+        except AttributeError:
+            fileNames = filenameList
+
+    filenameList = []
+    for path in fileNames:
+        if os.path.isdir(path):
+            # if value in --configfile arg is a directory return list of files in that directory
+            filenameList.extend([os.path.join(path, file) for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))])
+        else:
+            # if value in --configfile arg is a filepath return it
+            filenameList.append(path)
+
+    return filenameList
+
+
+def main(config):
+    invoicecollector = AttachmentCollector()
     invoiceupload = LexofficeUpload(apiToken=str(config['Lexoffice']['accessToken']))
     collectedFiles = []
     foundFiles = []
@@ -111,7 +143,7 @@ def main(config, runContinuously: bool = False):
         for file in foundFiles:  
 
             if args.verbose:
-                counter+=1
+                counter += 1
                 print(f"{counter}/{fileCount} - {file[0]}")
 
             collectedFiles.append(
@@ -133,15 +165,16 @@ def main(config, runContinuously: bool = False):
 
             invoiceupload.fileUpload(tmpDir.name, fileName)
 
-        
         if args.verbose and config['Default']['showTable'].lower() == 'true':
             print("")
             print(f"SUMMARY - {counter} processed files")
             headers = ['Mail Directory', 'Filename', 'Mail Subject', 'Mail From', 'Mail  Send Date']
             table = columnar(collectedFiles, headers, no_borders=False, max_column_width=None)
             print(table)
+
+            print("Done. Waiting for next cycle.")
     else:
-        if args.verbose: #and not runContinuously:
+        if args.verbose:
             print(f"[{get_timestamp()}] No new files found.")
 
     invoicecollector.logout()
@@ -154,42 +187,52 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, handle_sigterm)
     args = getArguments()
 
-    try:
-        if glob(args.filename[0]):
-            fileNames = [glob(filename)[0] for filename in args.filename if glob(filename)]
+    configFiles = get_configfiles(args.filename)
+
+    if configFiles:
+        # Run  in loop
+        if args.runContinuously:
+            cron_schedule_string = args.cronSchedule.replace('"', '').replace("'", "")
+            try:
+                # Validate cron schedule expression
+                CronValidator.parse(cron_schedule_string)
+            except ValueError as e:
+                exit(f"Error: Cron schedule expression is invalid ({cron_schedule_string}). {str(e)}")
+
+            cron_scheduler = CronScheduler(cron_schedule_string)
+
+            print(f"[{get_timestamp()}] Starting in continuous mode with cron schedule: {cron_schedule_string}")
+            try:
+                while True:
+                    if cron_scheduler.time_for_execution():
+                        for configFile in get_configfiles(args.filename):
+                            print(f"[{get_timestamp()}] Running {configFile}:")
+                            main(loadConfig(configFile))
+
+                        # runOnce is for debugging/testing the continuous-mode
+                        if args.runOnce:
+                            exit()
+
+                        # Wait before next cron-schedule check
+                        sleep(60)
+
+                    else:
+                        # Wait before next cron-schedule check
+                        sleep(15)
+            except KeyboardInterrupt:
+                exit()
+
+        # Run once
         else:
-            raise TypeError
-    except TypeError:
-        try:
-            fileNames = args.filename.split()
-        except AttributeError:
-            fileNames = args.filename
-
-    for path in fileNames:
-        if(os.path.isdir(path)):
-            fileNames = [os.path.join(path, file) for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))]
-
-    if args.runContinuously and fileNames:
-        print(f"[{get_timestamp()}] Starting in continuous mode with {args.intervall} seconds intervall.")
-        try:
-            while True:
-                for configFile in fileNames:
-                    print(f"[{get_timestamp()}] Running {configFile}:")
-                    main(loadConfig(configFile), args.runContinuously)
-
-                if args.runOnce:
-                    exit()
-
-                sleep(int(args.intervall))
-        except KeyboardInterrupt:
-            exit()
-
-    else:
-        if fileNames:
-            for configFile in fileNames:
+            for configFile in configFiles:
                 print(f"Running {configFile}:")
                 main(loadConfig(configFile))
-        else:
-            main(loadConfig(fileNames))
+
+    else:
+        try:
+            main(loadConfig())
+        except Exception:
+            print("No config files founds.")
+            exit(1)
 
 exit()
