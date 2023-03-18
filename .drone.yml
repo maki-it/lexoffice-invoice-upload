@@ -6,6 +6,10 @@ trigger:
   branch:
     exclude:
     - master
+    - feature/*
+  event:
+    exclude:
+    - tag
 
 steps:
   - name: Build private image
@@ -70,7 +74,7 @@ steps:
         - latest
         - $DRONE_TAG
     depends_on:
-      - Test
+      - clone
 
   - name: push to github cr
     image: plugins/docker
@@ -85,4 +89,4 @@ steps:
         - latest
         - $DRONE_TAG
     depends_on:
-      - Test
+      - clone
