@@ -1,6 +1,11 @@
 type: docker
 kind: pipeline
-name: default
+name: private
+
+trigger:
+  branch:
+    exclude:
+    - master
 
 steps:
   - name: Build private image
@@ -42,6 +47,16 @@ steps:
     depends_on:
       - Test
 
+---
+type: docker
+kind: pipeline
+name: publish
+
+trigger:
+  event:
+    - tag
+
+steps:
   - name: push to dockerhub
     image: plugins/docker
     settings:
@@ -53,13 +68,9 @@ steps:
       registry: docker.io
       tags:
         - latest
+        - $DRONE_TAG
     depends_on:
       - Test
-    when:
-      event:
-      - pull_request
-      - tag
-      - custom
 
   - name: push to github cr
     image: plugins/docker
@@ -72,10 +83,6 @@ steps:
       registry: ghcr.io
       tags:
         - latest
+        - $DRONE_TAG
     depends_on:
       - Test
-    when:
-      event:
-      - pull_request
-      - tag
-      - custom
