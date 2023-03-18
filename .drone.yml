@@ -60,8 +60,6 @@ steps:
       - pull_request
       - tag
       - custom
-      branch: 
-      - master
 
   - name: push to github cr
     image: plugins/docker
@@ -81,5 +79,3 @@ steps:
       - pull_request
       - tag
       - custom
-      branch: 
-      - master
