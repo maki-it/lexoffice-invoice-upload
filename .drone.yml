@@ -72,7 +72,7 @@ steps:
       registry: docker.io
       tags:
         - latest
-        - $DRONE_TAG
+        - ${DRONE_TAG}
     depends_on:
       - clone
 
@@ -87,6 +87,6 @@ steps:
       registry: ghcr.io
       tags:
         - latest
-        - $DRONE_TAG
+        - ${DRONE_TAG}
     depends_on:
       - clone
