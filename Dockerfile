@@ -15,6 +15,10 @@ RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
 
 FROM base
 
+LABEL org.opencontainers.image.description="Upload your invoices from email attachements automatically to Lexoffice." \
+      org.opencontainers.image.authors="Maki IT <kontakt@maki-it.de>" \
+      org.opencontainers.image.licenses="MIT"
+
 ENV TZ=Europe/Berlin \
     CRON='*/5 * * * *' \
     PYTHONUNBUFFERED=1
