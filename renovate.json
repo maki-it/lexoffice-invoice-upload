@@ -5,7 +5,7 @@
   ],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
-  "labels": ["renovatebot"],
+  "labels": ["Renovate"],
   "docker-compose": {
     "ignorePaths": ["apps_old"]
   },
