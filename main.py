@@ -126,7 +126,7 @@ def main(config):
 
     invoicecollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
-    for mailDir in mailDirs: 
+    for mailDir in mailDirs:
         invoicecollector.select(mailDir)
         status, mails = invoicecollector.searchMails(mailFilter)
         foundFiles.append(invoicecollector.searchAttachements(mails, mailDir, tuple(fileExtensionFilter), tuple(subjectFilter)))
@@ -203,6 +203,10 @@ if __name__ == "__main__":
 
             print(f"[{get_timestamp()}] Starting in continuous mode with cron schedule: {cron_schedule_string}")
             try:
+                for configFile in get_configfiles(args.filename):
+                    print(f"[{get_timestamp()}] Running {configFile}:")
+                    main(loadConfig(configFile))
+
                 while True:
                     if cron_scheduler.time_for_execution():
                         for configFile in get_configfiles(args.filename):
