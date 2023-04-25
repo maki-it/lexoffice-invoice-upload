@@ -71,7 +71,7 @@ class AttachmentCollector:
             rawEmail = data[0][1]
 
             # converts byte literal to string removing b''
-            rawEmailString = rawEmail.decode('utf-8')
+            rawEmailString = rawEmail.decode('utf-8', 'ignore')
             emailMessage = email.message_from_string(rawEmailString)
 
             # If subjectFilter is empty or subjectFilter contains a word in email subject
