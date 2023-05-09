@@ -44,7 +44,7 @@ def getArguments():
 
     parser.add_argument("-g", "--generate",
                         action="store_true", dest="generateConfig", default=False,
-                        help="Generate a new configruation file, optionally specify path and filename with --config argument.")
+                        help="Generate a new configruation file, optionally specify path and filename with --configfile argument.")
 
     parser.add_argument("-l", "--loop", "--continuous",
                         action="store_true", dest="runContinuously", default=False,
