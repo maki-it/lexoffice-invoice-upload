@@ -63,7 +63,7 @@ class AttachmentCollector:
         
         for num in mails[0].split():
             # Fetch found mail from selected maildir 
-            returnvalue, data = self.imap.fetch(num, '(RFC822)' )
+            returnvalue, data = self.imap.fetch(num, '(RFC822)')
 
             # Set mail as seen
             self.imap.store(mails[0].decode('utf-8').replace(' ',','), '+FLAGS', '\Seen')
@@ -71,7 +71,7 @@ class AttachmentCollector:
             rawEmail = data[0][1]
 
             # converts byte literal to string removing b''
-            rawEmailString = rawEmail.decode('utf-8')
+            rawEmailString = rawEmail.decode('utf-8', 'ignore')
             emailMessage = email.message_from_string(rawEmailString)
 
             # If subjectFilter is empty or subjectFilter contains a word in email subject
@@ -87,7 +87,7 @@ class AttachmentCollector:
                     fileName = part.get_filename()
 
                     if bool(fileName):
-                        # Check if fileName ending matches list of fileextensions from config
+                        # Check if fileName ending matches list of file extensions from config
                         if fileName.lower().endswith(fileExtensionFilter):
                             foundFiles.append((fileName, mailDir, emailMessage, part))
                         
