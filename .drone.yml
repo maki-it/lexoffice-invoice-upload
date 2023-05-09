@@ -59,9 +59,10 @@ name: publish
 trigger:
   event:
     - tag
+    - cron
 
 steps:
-  - name: push to dockerhub
+  - name: build for dockerhub
     image: plugins/docker
     settings:
       repo: makiit/lexoffice-invoice-upload
@@ -76,7 +77,7 @@ steps:
     depends_on:
       - clone
 
-  - name: push to github cr
+  - name: build for github cr
     image: plugins/docker
     settings:
       repo: ghcr.io/maki-it/lexoffice-invoice-upload
