@@ -2,6 +2,7 @@ import imaplib
 import os
 import email
 from sys import exit
+from tempfile import _TemporaryFileWrapper  # Weak error
 
 
 class AttachmentCollector:
@@ -70,7 +71,7 @@ class AttachmentCollector:
 
             rawEmail = data[0][1]
 
-            # converts byte literal to string removing b''
+            # convert byte literal to string
             rawEmailString = rawEmail.decode('utf-8', 'ignore')
             emailMessage = email.message_from_string(rawEmailString)
 
@@ -93,20 +94,9 @@ class AttachmentCollector:
                         
         return foundFiles
 
-    def downloadAttachements(self, file: list, tmpDir: str) -> list:
+    def downloadAttachements(self, file: list, tmpFile: _TemporaryFileWrapper) -> list[list, _TemporaryFileWrapper]:
         """"Download attachements with specified file extensions from mail"""
         fileName, mailDir, emailMessage, part = file
-        filePath = os.path.join(tmpDir, file[0])
 
-        # Check if file doesn't already exist before download
-        if not os.path.isfile(filePath):
-            fp = open(filePath, 'wb')
-            fp.write(part.get_payload(decode=True))
-            fp.close()
-            return [mailDir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']]
-        else:
-            return None
-
-            
-        
-
+        tmpFile.write(part.get_payload(decode=True))
+        return [[mailDir, fileName, emailMessage['subject'], emailMessage['from'], emailMessage['date']], tmpFile]

@@ -6,8 +6,7 @@ sys.dont_write_bytecode = True
 
 import os
 import signal
-import tempfile
-import itertools
+from tempfile import NamedTemporaryFile as CreateTemporaryFile
 from cron_validator import CronScheduler, CronValidator
 from argparse import ArgumentParser
 from time import sleep
@@ -122,7 +121,6 @@ def main(config):
     mailFilter = config['Mail']['filter']
     fileExtensionFilter = config['Mail']['extensionsToCheck'].lower().split(',')
     subjectFilter = config['Mail']['subjectsToCheck'].split(',')
-    tmpDir = tempfile.TemporaryDirectory() # Create temporary directory for file attachements
 
     invoicecollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
@@ -140,14 +138,15 @@ def main(config):
             counter = 0
             print(f"\n⬇ Downloading {len(foundFiles)} files...") 
 
-        for file in foundFiles:  
+        for file in foundFiles:
+            tmpFile = CreateTemporaryFile()
 
             if args.verbose:
                 counter += 1
                 print(f"{counter}/{fileCount} - {file[0]}")
 
             collectedFiles.append(
-                invoicecollector.downloadAttachements(file, tmpDir.name)
+                invoicecollector.downloadAttachements(file, tmpFile)
             )
 
     if collectedFiles:
@@ -156,18 +155,19 @@ def main(config):
             counter = 0
             print(f"\n⬆ Uploading {fileCount} files...")
 
-        for file in collectedFiles:
-            try:
-                fileName = file[1]
-            except TypeError as error:
-                print(f"{error} with File:")
-                print(file)
+        fileNames = []
+        for index, file in enumerate(collectedFiles):
+            tmpFile = file[1]
+            fileName = file[0][1]
+            fileNames.append(fileName)
 
             if args.verbose:
                 counter+=1
                 print(f"{counter}/{fileCount} - {fileName}")
 
-            invoiceupload.fileUpload(tmpDir.name, fileName)
+            invoiceupload.fileUpload(tmpFile, fileName)
+            tmpFile.close()
+            collectedFiles[index] = file[0]
 
         if args.verbose and config['Default']['showTable'].lower() == 'true':
             print("")
@@ -182,7 +182,6 @@ def main(config):
             print(f"[{get_timestamp()}] No new files found.")
 
     invoicecollector.logout()
-    tmpDir.cleanup()
 
 
 ### Run
@@ -208,13 +207,13 @@ if __name__ == "__main__":
             print(f"[{get_timestamp()}] Starting in continuous mode with cron schedule: {cron_schedule_string}")
             try:
                 for configFile in get_configfiles(args.filename):
-                    print(f"[{get_timestamp()}] Running {configFile}:")
+                    print(f"[{get_timestamp()}] Checking {configFile}:")
                     main(loadConfig(configFile))
 
                 while True:
                     if cron_scheduler.time_for_execution():
                         for configFile in get_configfiles(args.filename):
-                            print(f"[{get_timestamp()}] Running {configFile}:")
+                            print(f"[{get_timestamp()}] Checking {configFile}:")
                             main(loadConfig(configFile))
 
                         # runOnce is for debugging/testing the continuous-mode
