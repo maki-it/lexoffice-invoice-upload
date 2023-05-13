@@ -157,7 +157,11 @@ def main(config):
             print(f"\n⬆ Uploading {fileCount} files...")
 
         for file in collectedFiles:
-            fileName = file[1]
+            try:
+                fileName = file[1]
+            except TypeError as error:
+                print(f"{error} with File:")
+                print(file)
 
             if args.verbose:
                 counter+=1

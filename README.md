@@ -14,6 +14,11 @@ Change the settings in that file and then restart the container.
 You can add as many configuration files as you like to this directory and also name them as you like. 
 The program will iterate over all of them in alphabetical order.
 
+### Tags
+
+- Use the `latest` tag, to benefit from updated packages and security updates even between released versions.
+- Use the version tags for fixed image states.
+
 ### Environment variables
 
 You can adjust some options in the container with the following environment variables:

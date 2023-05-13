@@ -91,3 +91,41 @@ steps:
         - ${DRONE_TAG}
     depends_on:
       - clone
+
+---
+type: docker
+kind: pipeline
+name: update
+
+trigger:
+  event:
+    - cron
+
+steps:
+  - name: build for dockerhub
+    image: plugins/docker
+    settings:
+      repo: makiit/lexoffice-invoice-upload
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_token
+      registry: docker.io
+      tags:
+        - latest
+    depends_on:
+      - clone
+
+  - name: build for github cr
+    image: plugins/docker
+    settings:
+      repo: ghcr.io/maki-it/lexoffice-invoice-upload
+      username:
+        from_secret: github_user
+      password:
+        from_secret: github_token
+      registry: ghcr.io
+      tags:
+        - latest
+    depends_on:
+      - clone
