@@ -16,7 +16,7 @@ The program will iterate over all of them in alphabetical order.
 
 ### Tags
 
-- Use the `latest` tag, to benefit from updated packages and security updates even between released versions.
+- Use the `latest` tag, to benefit from weekly updates for packages and security patches even between released versions.
 - Use the version tags for fixed image states.
 
 ### Environment variables
