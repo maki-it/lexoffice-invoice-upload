@@ -59,7 +59,6 @@ name: publish
 trigger:
   event:
     - tag
-    - cron
 
 steps:
   - name: build for dockerhub
