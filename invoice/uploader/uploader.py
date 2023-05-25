@@ -1,4 +1,5 @@
 import pycurl
+from urllib import parse
 
 
 class LexofficeUpload:
@@ -24,7 +25,7 @@ class LexofficeUpload:
             c.setopt(c.HTTPPOST, [
                 ("file", (
                      c.FORM_FILE, tmpFile.name,
-                     c.FORM_FILENAME, fileName
+                     c.FORM_FILENAME, parse.quote(fileName)
                  )
                  ),
                 ("type", "voucher")
