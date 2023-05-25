@@ -125,6 +125,10 @@ def main(config):
     invoicecollector.login(config['Mail']['username'], config['Mail']['password'], config['Mail']['host'], config['Mail']['port'], config['Mail']['encryption'])
 
     for mailDir in mailDirs:
+        # Remove trailing slash from mailDir string if exists to avoid maillib error with unknown directory path
+        if mailDir.endswith('/') or mailDir.startswith('/'):
+            print("Warning! Paths in ['Mail']['maildir'] should not start or end with a slash, so it will be removed from the path:", mailDir)
+            mailDir = mailDir.lstrip('/').rstrip('/')
         invoicecollector.select(mailDir)
         status, mails = invoicecollector.searchMails(mailFilter)
         foundFiles.append(invoicecollector.searchAttachements(mails, mailDir, tuple(fileExtensionFilter), tuple(subjectFilter)))
