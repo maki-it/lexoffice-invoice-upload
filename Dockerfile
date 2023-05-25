@@ -19,6 +19,8 @@ LABEL org.opencontainers.image.description="Upload your invoices from email atta
       org.opencontainers.image.authors="Maki IT <kontakt@maki-it.de>" \
       org.opencontainers.image.licenses="MIT"
 
+STOPSIGNAL SIGINT
+
 ENV TZ=Europe/Berlin \
     CRON='*/5 * * * *' \
     PYTHONUNBUFFERED=1
