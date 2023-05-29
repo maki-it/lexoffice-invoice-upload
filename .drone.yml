@@ -15,8 +15,8 @@ steps:
   - name: Build private image
     image: plugins/docker
     settings:
-      repo: git.maki-it.corp/kim/lexoffice-invoice-upload
-      registry: git.maki-it.corp
+      repo: git.prod.maki-it.de/kim/lexoffice-invoice-upload
+      registry: git.prod.maki-it.de
       username: 
         from_secret: registry_username
       password:
@@ -27,7 +27,7 @@ steps:
       - clone
     
   - name: Test
-    image: git.maki-it.corp/kim/lexoffice-invoice-upload:develop
+    image: git.prod.maki-it.de/kim/lexoffice-invoice-upload:develop
     pull: always
     environment:
       TESTCONFIG:
@@ -47,7 +47,7 @@ steps:
   - name: Recreate live testing
     image: alpine/curl:latest
     commands:
-      - "curl -X POST https://docker.maki-it.corp/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
+      - "curl -X POST https://docker.prod.maki-it.de/api/stacks/webhooks/534764f3-6427-4321-82e0-ebfefd4b2e3b"
     depends_on:
       - Test
 
