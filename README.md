@@ -1,5 +1,7 @@
 # Lexoffice Invoice Upload
 
+[![CodeQL](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/github-code-scanning/codeql)
+
 Upload your invoices from email attachements automatically to Lexoffice.
 
 # Usage
