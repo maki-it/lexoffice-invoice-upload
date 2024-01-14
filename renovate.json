@@ -1,29 +1,7 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dashboard",
-  "labels": ["Renovate"],
-  "docker-compose": {
-    "ignorePaths": ["apps_old"]
-  },
-  "hostRules": [
-    {
-      "matchHost": "docker.io",
-      "concurrentRequestLimit": 2
-    }
-  ],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": true
-    }
-  ],
-  "platformAutomerge": true
-}
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+      "github>maki-it/renovate-config:default.json5",
+      "github>maki-it/renovate-config:lang-python.json5"
+    ]
+  }
