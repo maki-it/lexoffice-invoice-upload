@@ -38,4 +38,4 @@ jobs:
       - name: Run app
         run: |
           echo "${{ secrets.TEST_CONFIG }}" > ${{ env.FILEPATH }}
-          ./docker/entrypoint.sh python3 main.py --configfile ${{ env.FILEPATH }} --continuous --cron "${{ env.CRON }}" --run-once 2>&1
+          bash ./docker/entrypoint.sh python3 main.py --configfile ${{ env.FILEPATH }} --continuous --cron "${{ env.CRON }}" --run-once 2>&1
