@@ -11,7 +11,7 @@ env:
   CRON: '* * * * *'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y aptitude
-          sudo aptitude install libssl-dev libcurl4-openssl-dev libcurl4-gnutls-dev python3-dev
+          sudo aptitude install -y libssl-dev libcurl4-openssl-dev libcurl4-gnutls-dev python3-dev
           pip install pycurl
           pip install -r requirements.txt
 
