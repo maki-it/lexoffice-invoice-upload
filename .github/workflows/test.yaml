@@ -11,7 +11,7 @@ env:
   CRON: '* * * * *'
 
 jobs:
-  test:
+  Test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install python3-pycurl
+          sudo apt-get -y install libcurl4-openssl-dev libssl-dev python3-pycurl
           pip install -r requirements.txt
 
       - name: Generate config file
