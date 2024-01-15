@@ -40,7 +40,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository }}
-            ${{ github.repository }}
+            makiit/lexoffice-invoice-upload
           flavor: |
             latest=auto
           tags: |
