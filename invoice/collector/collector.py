@@ -22,13 +22,13 @@ class AttachmentCollector:
 
         if encryptionMethod.lower() == 'ssl':
             self.imap = imaplib.IMAP4_SSL(host, port)
-        
+
         elif encryptionMethod.lower() == 'starttls':
             from ssl import create_default_context
             tls_context = create_default_context()
             self.imap = imaplib.IMAP4(host, port)
             self.imap.starttls(ssl_context=tls_context)
-        
+
         else:
             exit("Error: ['Mail']['encryption'] in config must be set to either SSL or STARTTLS")
 
@@ -40,7 +40,7 @@ class AttachmentCollector:
             else:
                 exit("Error: ", str(e))
 
-    def logout(self) -> None: 
+    def logout(self) -> None:
         """Safely close the connection and logout of mail server"""
         self.imap.close()
         self.imap.logout()
@@ -61,13 +61,13 @@ class AttachmentCollector:
         """Search given mails for attachements with applied filter"""
 
         foundFiles = []
-        
+
         for num in mails[0].split():
-            # Fetch found mail from selected maildir 
+            # Fetch found mail from selected maildir
             returnvalue, data = self.imap.fetch(num, '(RFC822)')
 
             # Set mail as seen
-            self.imap.store(mails[0].decode('utf-8').replace(' ',','), '+FLAGS', '\Seen')
+            self.imap.store(mails[0].decode('utf-8').replace(' ',','), '+FLAGS', '\\Seen')
 
             rawEmail = data[0][1]
 
@@ -77,7 +77,7 @@ class AttachmentCollector:
 
             # If subjectFilter is empty or subjectFilter contains a word in email subject
             if not all(subjectFilter) or any(substring in emailMessage['subject'] for substring in subjectFilter):
-                # download attachments from mail 
+                # download attachments from mail
                 for part in emailMessage.walk():
 
                     if part.get_content_maintype() == 'multipart':
@@ -91,7 +91,7 @@ class AttachmentCollector:
                         # Check if fileName ending matches list of file extensions from config
                         if fileName.lower().endswith(fileExtensionFilter):
                             foundFiles.append((fileName, mailDir, emailMessage, part))
-                        
+
         return foundFiles
 
     def downloadAttachements(self, file: list, tmpFile: _TemporaryFileWrapper) -> list[list, _TemporaryFileWrapper]:
