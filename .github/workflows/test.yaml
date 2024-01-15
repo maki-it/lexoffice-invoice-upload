@@ -31,12 +31,11 @@ jobs:
 
       - name: Generate config file
         run: |
-          python3 /app/main.py -h
-          python3 /app/main.py --generate --configfile ${{ env.FILEPATH }}
+          python3 main.py -h
+          python3 main.py --generate --configfile ${{ env.FILEPATH }}
           cat ${{ env.FILEPATH }}
 
       - name: Run app
         run: |
           echo "${{ secrets.TEST_CONFIG }}" > ${{ env.FILEPATH }}
-          echo "python3 /app/main.py --configfile ${{ env.FILEPATH }} --continuous --cron '${{ env.CRON }}' --run-once"
-          /app/docker/entrypoint.sh python3 /app/main.py --configfile ${{ env.FILEPATH }} --continuous --cron "${{ env.CRON }}" --run-once 2>&1
+          ./docker/entrypoint.sh python3 main.py --configfile ${{ env.FILEPATH }} --continuous --cron "${{ env.CRON }}" --run-once 2>&1
