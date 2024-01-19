@@ -23,10 +23,14 @@ jobs:
           python-version: 3.12
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install PyCurl
+        uses: awalsh128/cache-apt-pkgs-action@v1.3.1
+        with:
+          packages: libcurl4-openssl-dev libssl-dev python3-pycurl
+          version: 1.0
+
+      - name: Install Python dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get -y install libcurl4-openssl-dev libssl-dev python3-pycurl
           pip install -r requirements.txt
 
       - name: Generate config file
@@ -35,7 +39,10 @@ jobs:
           python3 main.py --generate --configfile ${{ env.FILEPATH }}
           cat ${{ env.FILEPATH }}
 
-      - name: Run app
+      - name: Prepare test config file
         run: |
           echo "${{ secrets.TEST_CONFIG }}" > ${{ env.FILEPATH }}
+
+      - name: Run app
+        run: |
           python3 main.py --configfile ${{ env.FILEPATH }} --continuous --cron "${{ env.CRON }}" --run-once 2>&1
