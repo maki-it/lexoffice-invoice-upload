@@ -24,7 +24,7 @@ jobs:
           cache: "pip"
 
       - name: Install PyCurl
-        uses: awalsh128/cache-apt-pkgs-action@v1.4.1
+        uses: awalsh128/cache-apt-pkgs-action@v1.4.2
         with:
           packages: libcurl4-openssl-dev libssl-dev python3-pycurl
           version: 1.0
