@@ -1,4 +1,4 @@
 configparser~=7.1.0
 columnar~=1.4.1
-pycurl~=7.45.3
+pycurl~=7.45.4
 cron-validator~=1.0.8
