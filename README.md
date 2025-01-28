@@ -1,5 +1,9 @@
 # Lexoffice Invoice Upload
 
+> [!WARNING]
+> Since you now can send/redirect mails directly to Lexoffice (see [docs](https://support.lexoffice.de/de-form/articles/9366911-eingangsbelege-uber-e-mail-hochladen)), this project is no longer needed and therefore _**deprecated**_.  
+> If you (like me) use Paperless-ngx as your document management system, you can also instead use the [paperless-to-lexoffice](https://github.com/stefanlachner/paperless-to-lexoffice) project.
+
 [![CodeQL](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/github-code-scanning/codeql)
 
 [![Build and Publish](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/build.yaml/badge.svg)](https://github.com/maki-it/lexoffice-invoice-upload/actions/workflows/build.yaml)
